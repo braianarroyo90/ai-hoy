@@ -38,6 +38,9 @@ def redact():
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     client   = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
+    # also retry articles that errored previously
+    supabase.table("articles").update({"status": "curated"}).eq("status", "error").execute()
+
     curated = (
         supabase.table("articles")
         .select("*")
@@ -65,7 +68,13 @@ def redact():
                 messages=[{"role": "user", "content": prompt}],
             )
 
-            result = json.loads(message.content[0].text)
+            raw = message.content[0].text.strip()
+            # strip markdown code fences if present
+            if raw.startswith("```"):
+                raw = raw.split("```")[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+            result = json.loads(raw.strip())
 
             supabase.table("articles").update({
                 "es_title":   result.get("es_title"),
