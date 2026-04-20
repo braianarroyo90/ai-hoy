@@ -24,7 +24,7 @@ async function getArticles(category?: string, page = 1): Promise<{ articles: Art
 
   let query = supabase
     .from("articles")
-    .select("id, source_url, source_name, og_image, published_at, es_title, es_summary, tags, category", { count: "exact" })
+    .select("id, source_url, source_name, og_image, published_at, es_title, es_summary, tags, category, slug", { count: "exact" })
     .eq("status", "published")
     .order("published_at", { ascending: false })
     .range(from, to);
