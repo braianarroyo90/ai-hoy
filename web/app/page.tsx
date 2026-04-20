@@ -7,6 +7,15 @@ export const revalidate = 3600;
 
 const PAGE_SIZE = 30;
 
+// Repeating editorial pattern every 7 cards:
+// [lg][sm] / [md][md][md] / [sm][lg]
+function getCardSize(i: number): "lg" | "md" | "sm" {
+  const pos = i % 7;
+  if (pos === 0 || pos === 6) return "lg";
+  if (pos === 1 || pos === 5) return "sm";
+  return "md";
+}
+
 const CATEGORIES = [
   "Modelos y LLMs",
   "Herramientas y Productos",
@@ -76,15 +85,16 @@ export default async function Home({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
     <main className="min-h-screen bg-zinc-950 text-white">
-      <header className="border-b border-zinc-800 px-6 py-5">
+      <header className="sticky top-0 z-50 border-b border-zinc-800/60 px-6 py-4 backdrop-blur-md bg-zinc-950/85">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">AI Hoy</h1>
+            <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              <span className="text-blue-400">AI</span> Hoy
+            </h1>
             <p className="text-zinc-400 text-sm mt-0.5">
-              Las mejores noticias de inteligencia artificial, en español
+              Noticias de inteligencia artificial en español
             </p>
           </div>
-          <span className="text-xs text-zinc-500">Actualizado cada 6h</span>
         </div>
       </header>
 
@@ -98,8 +108,8 @@ export default async function Home({
         ) : (
           <>
             <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {articles.map((a) => (
-                <ArticleCard key={a.id} article={a} />
+              {articles.map((a, i) => (
+                <ArticleCard key={a.id} article={a} size={getCardSize(i)} />
               ))}
             </div>
 

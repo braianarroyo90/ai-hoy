@@ -79,10 +79,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className="min-h-screen bg-zinc-950 text-white">
-        <header className="border-b border-zinc-800 px-6 py-5">
+        <header className="sticky top-0 z-50 border-b border-zinc-800/60 px-6 py-4 backdrop-blur-md bg-zinc-950/85">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold tracking-tight hover:text-zinc-300 transition-colors">
-              AI Hoy
+            <Link href="/" className="text-xl font-bold tracking-tight hover:text-zinc-300 transition-colors" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              <span className="text-blue-400">AI</span> Hoy
             </Link>
             <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors">
               ← Volver al inicio
@@ -100,7 +100,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </Link>
           )}
 
-          <h1 className="text-2xl sm:text-3xl font-bold leading-snug text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold leading-snug text-white mb-4" style={{ fontFamily: "var(--font-space-grotesk)" }}>
             {article.es_title}
           </h1>
 
@@ -124,7 +124,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
           <div className="prose prose-invert prose-zinc max-w-none">
             {paragraphs.map((p: string, i: number) => (
-              <p key={i} className="text-zinc-300 leading-relaxed mb-4 text-base sm:text-lg">
+              <p key={i} className="text-zinc-300 leading-7 mb-5 text-base sm:text-lg">
                 {p}
               </p>
             ))}
@@ -140,12 +140,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </div>
           )}
 
-          <div className="mt-10 pt-6 border-t border-zinc-800">
+          <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center justify-between flex-wrap gap-4">
+            <Link
+              href="/"
+              className="text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            >
+              ← Volver al inicio
+            </Link>
             <a
               href={article.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-zinc-900 font-medium text-sm hover:bg-zinc-100 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-zinc-900 font-medium text-sm hover:bg-zinc-100 transition-colors cursor-pointer"
             >
               Leer artículo original en {article.source_name} →
             </a>
