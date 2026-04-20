@@ -13,6 +13,8 @@ export type Article = {
   published_at: string;
   es_title: string;
   es_summary: string;
+  es_body?: string;
   tags: string[];
   category: string;
+  slug?: string;
 };

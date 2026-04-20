@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Article } from "@/lib/supabase";
 
 function timeAgo(dateStr: string): string {
@@ -12,13 +13,11 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function ArticleCard({ article }: { article: Article }) {
-  return (
-    <a
-      href={article.source_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-600 transition-colors overflow-hidden"
-    >
+  const href = article.slug ? `/articulo/${article.slug}` : article.source_url;
+  const isInternal = !!article.slug;
+
+  const content = (
+    <>
       {article.og_image && (
         <div className="relative h-44 w-full bg-zinc-800">
           <Image
@@ -56,8 +55,18 @@ export default function ArticleCard({ article }: { article: Article }) {
           ))}
         </div>
 
-        <span className="text-xs text-blue-400 mt-1">Leer artículo completo →</span>
+        <span className="text-xs text-blue-400 mt-1">
+          {isInternal ? "Leer análisis completo →" : "Leer artículo original →"}
+        </span>
       </div>
-    </a>
+    </>
+  );
+
+  const className = "group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 hover:border-zinc-600 transition-colors overflow-hidden";
+
+  return isInternal ? (
+    <Link href={href} className={className}>{content}</Link>
+  ) : (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>{content}</a>
   );
 }
