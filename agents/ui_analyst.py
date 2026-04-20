@@ -160,6 +160,12 @@ def generate_proposals(vercel: dict, supa: dict) -> list[dict]:
     )
 
     raw = msg.content[0].text.strip()
+    # Strip markdown code fences if present
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
     data = json.loads(raw)
     return data.get("propuestas", [])
 
