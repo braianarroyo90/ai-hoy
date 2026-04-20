@@ -151,7 +151,7 @@ def generate_proposals(vercel: dict, supa: dict) -> list[dict]:
 
     msg = claude.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=1500,
+        max_tokens=4096,
         system=SYSTEM_PROMPT,
         messages=[{
             "role": "user",
