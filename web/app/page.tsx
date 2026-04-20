@@ -55,7 +55,26 @@ export default async function Home({
     return `/?${q.toString()}`;
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "AI Hoy",
+    url: "https://ai-hoy.vercel.app",
+    description: "Las mejores noticias de inteligencia artificial en español",
+    inLanguage: "es",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://ai-hoy.vercel.app/?category={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <main className="min-h-screen bg-zinc-950 text-white">
       <header className="border-b border-zinc-800 px-6 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
@@ -111,5 +130,6 @@ export default async function Home({
         )}
       </div>
     </main>
+    </>
   );
 }
