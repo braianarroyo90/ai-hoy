@@ -2,7 +2,7 @@ name: AI News Pipeline
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # every 6 hours: 00:00, 06:00, 12:00, 18:00 UTC
+    - cron: "0 9 * * *"   # once a day at 9:00 UTC (6am Argentina)
   workflow_dispatch:          # allows manual trigger from GitHub UI
 
 jobs:

@@ -10,7 +10,7 @@ from supabase import create_client
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 
-MAX_TO_PUBLISH_PER_RUN = 30
+MAX_TO_PUBLISH_PER_RUN = 10
 
 SOURCE_PRIORITY = {
     "OpenAI Blog":        10,
