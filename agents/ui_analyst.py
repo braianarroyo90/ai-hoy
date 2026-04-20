@@ -43,81 +43,78 @@ def fetch_posthog_metrics() -> dict:
     headers = {"Authorization": f"Bearer {POSTHOG_PERSONAL_KEY}"}
     base    = f"{POSTHOG_BASE}/api/projects/{POSTHOG_PROJECT_ID}"
 
-    try:
-        # Top pages by pageview count
+    def hogql(query: str) -> list:
         r = requests.post(f"{base}/query/", headers=headers, timeout=15, json={
-            "query": {
-                "kind": "HogQLQuery",
-                "query": f"""
-                    SELECT properties.$pathname AS path, count() AS views
-                    FROM events
-                    WHERE event = '$pageview'
-                      AND timestamp >= '{from_}' AND timestamp <= '{to_}'
-                    GROUP BY path
-                    ORDER BY views DESC
-                    LIMIT 20
-                """
-            }
+            "query": {"kind": "HogQLQuery", "query": query}
         })
         r.raise_for_status()
-        top_pages = [{"path": row[0], "views": row[1]} for row in r.json().get("results", [])]
+        return r.json().get("results", [])
+
+    try:
+        # Top pages by views
+        top_pages = [
+            {"path": row[0], "views": row[1]}
+            for row in hogql(f"""
+                SELECT properties.$pathname, count()
+                FROM events
+                WHERE event = '$pageview'
+                  AND toDate(timestamp) >= '{from_}'
+                  AND toDate(timestamp) <= '{to_}'
+                GROUP BY properties.$pathname
+                ORDER BY count() DESC
+                LIMIT 20
+            """)
+        ]
 
         # Device breakdown
-        r2 = requests.post(f"{base}/query/", headers=headers, timeout=15, json={
-            "query": {
-                "kind": "HogQLQuery",
-                "query": f"""
-                    SELECT properties.$device_type AS device, count() AS sessions
-                    FROM events
-                    WHERE event = '$pageview'
-                      AND timestamp >= '{from_}' AND timestamp <= '{to_}'
-                    GROUP BY device
-                    ORDER BY sessions DESC
-                """
-            }
-        })
-        r2.raise_for_status()
-        devices = [{"device": row[0], "sessions": row[1]} for row in r2.json().get("results", [])]
+        devices = [
+            {"device": row[0] or "unknown", "views": row[1]}
+            for row in hogql(f"""
+                SELECT properties.$device_type, count()
+                FROM events
+                WHERE event = '$pageview'
+                  AND toDate(timestamp) >= '{from_}'
+                  AND toDate(timestamp) <= '{to_}'
+                GROUP BY properties.$device_type
+                ORDER BY count() DESC
+            """)
+        ]
 
-        # Avg session duration (seconds)
-        r3 = requests.post(f"{base}/query/", headers=headers, timeout=15, json={
-            "query": {
-                "kind": "HogQLQuery",
-                "query": f"""
-                    SELECT round(avg(session.$session_duration)) AS avg_duration_sec
-                    FROM sessions
-                    WHERE min_timestamp >= '{from_}' AND min_timestamp <= '{to_}'
-                """
-            }
-        })
-        r3.raise_for_status()
-        avg_session = r3.json().get("results", [[0]])[0][0]
+        # Unique visitors
+        visitors = hogql(f"""
+            SELECT count(DISTINCT distinct_id)
+            FROM events
+            WHERE event = '$pageview'
+              AND toDate(timestamp) >= '{from_}'
+              AND toDate(timestamp) <= '{to_}'
+        """)
+        unique_visitors = visitors[0][0] if visitors else 0
 
-        # Bounce rate (sessions with only 1 pageview)
-        r4 = requests.post(f"{base}/query/", headers=headers, timeout=15, json={
-            "query": {
-                "kind": "HogQLQuery",
-                "query": f"""
-                    SELECT
-                        countIf(session.$pageview_count = 1) AS bounced,
-                        count() AS total,
-                        round(100 * countIf(session.$pageview_count = 1) / count(), 1) AS bounce_rate_pct
-                    FROM sessions
-                    WHERE min_timestamp >= '{from_}' AND min_timestamp <= '{to_}'
-                """
-            }
-        })
-        r4.raise_for_status()
-        bounce_row  = r4.json().get("results", [[0, 0, 0]])[0]
-        bounce_rate = {"bounced": bounce_row[0], "total": bounce_row[1], "bounce_rate_pct": bounce_row[2]}
+        # Bounce rate: sessions with only 1 pageview
+        bounce_data = hogql(f"""
+            SELECT
+                countIf(cnt = 1) AS bounced,
+                count()          AS total
+            FROM (
+                SELECT $session_id, count() AS cnt
+                FROM events
+                WHERE event = '$pageview'
+                  AND toDate(timestamp) >= '{from_}'
+                  AND toDate(timestamp) <= '{to_}'
+                GROUP BY $session_id
+            )
+        """)
+        bounced = bounce_data[0][0] if bounce_data else 0
+        total   = bounce_data[0][1] if bounce_data else 1
+        bounce_rate_pct = round(100 * bounced / total, 1) if total else 0
 
-        print(f"   PostHog: {len(top_pages)} páginas, bounce {bounce_rate['bounce_rate_pct']}%, sesión avg {avg_session}s")
+        print(f"   PostHog: {len(top_pages)} páginas, {unique_visitors} visitantes, bounce {bounce_rate_pct}%")
         return {
-            "period":           f"{from_} to {to_}",
-            "top_pages":        top_pages,
-            "devices":          devices,
-            "avg_session_sec":  avg_session,
-            "bounce_rate":      bounce_rate,
+            "period":          f"{from_} to {to_}",
+            "unique_visitors": unique_visitors,
+            "top_pages":       top_pages,
+            "devices":         devices,
+            "bounce_rate_pct": bounce_rate_pct,
         }
 
     except Exception as e:
