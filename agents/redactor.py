@@ -69,9 +69,9 @@ def redact():
             )
 
             raw = message.content[0].text.strip()
-            # strip markdown code fences if present
+            print(f"    Claude raw response: {raw[:200]}")
             if raw.startswith("```"):
-                raw = raw.split("```")[1]
+                raw = raw.split("```", 2)[1]
                 if raw.startswith("json"):
                     raw = raw[4:]
             result = json.loads(raw.strip())
