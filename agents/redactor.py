@@ -85,7 +85,9 @@ def redact():
             }).eq("id", article["id"]).execute()
 
         except Exception as e:
-            print(f"  ERROR on {article['id']}: {e}")
+            import traceback
+            print(f"  ERROR on {article['id']}: {type(e).__name__}: {e}")
+            traceback.print_exc()
             supabase.table("articles").update({"status": "error"}).eq("id", article["id"]).execute()
 
     print("Redactor done.")
