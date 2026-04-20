@@ -29,8 +29,23 @@ RSS_FEEDS = [
     {"name": "Anthropic Blog",         "url": "https://www.anthropic.com/rss.xml"},
     {"name": "Mistral Blog",           "url": "https://mistral.ai/news/rss"},
     {"name": "Scale AI Blog",          "url": "https://scale.com/blog/feed"},
-    {"name": "Last Week in AI",        "url": "https://lastweekin.ai/feed"},
+    {"name": "Last Week in AI",           "url": "https://lastweekin.ai/feed"},
     {"name": "The AI Beat (VentureBeat)", "url": "https://venturebeat.com/category/ai/feed/"},
+    # Tech general con mucho AI
+    {"name": "ZDNet AI",                  "url": "https://www.zdnet.com/topic/artificial-intelligence/rss.xml"},
+    {"name": "IEEE Spectrum AI",          "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"},
+    {"name": "KDnuggets",                 "url": "https://www.kdnuggets.com/feed"},
+    {"name": "Synced AI",                 "url": "https://syncedreview.com/feed/"},
+    {"name": "AI Trends",                 "url": "https://www.aitrends.com/feed/"},
+    {"name": "InfoQ AI",                  "url": "https://www.infoq.com/ai-ml-data-eng/rss/"},
+    {"name": "The Register ML",           "url": "https://www.theregister.com/machine_learning/headlines.atom"},
+    {"name": "Analytics Vidhya",          "url": "https://www.analyticsvidhya.com/feed/"},
+    # Diseño + AI
+    {"name": "UX Collective",             "url": "https://uxdesign.cc/feed"},
+    {"name": "Smashing Magazine",         "url": "https://www.smashingmagazine.com/feed/"},
+    {"name": "Prototypr",                 "url": "https://prototypr.io/feed/"},
+    {"name": "Creative Bloq",             "url": "https://www.creativebloq.com/feed"},
+    {"name": "Muzli Design",              "url": "https://medium.com/feed/muzli-design-inspiration"},
 ]
 
 AI_KEYWORDS = [
@@ -38,6 +53,10 @@ AI_KEYWORDS = [
     "large language model", "llm", "gpt", "claude", "gemini", "mistral", "openai",
     "anthropic", "deepmind", "generative ai", "diffusion model", "transformer",
     "chatbot", "ai agent", "rag", "fine-tuning", "benchmark", "multimodal",
+    # diseño + AI
+    "ai design", "design ai", "generative design", "midjourney", "stable diffusion",
+    "dall-e", "ai art", "ai generated", "ai tool", "ai powered", "figma ai",
+    "ux ai", "ui ai", "design tool", "creative ai", "ai workflow",
 ]
 
 
