@@ -12,6 +12,7 @@ const CATEGORIES = [
   "Política y Ética",
   "Robótica",
   "Agentes de IA",
+  "Diseño e IA",
 ];
 
 async function getArticles(category?: string): Promise<Article[]> {

@@ -16,7 +16,8 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
 CATEGORIES = [
     "Modelos y LLMs", "Herramientas y Productos", "Investigación",
-    "Empresas y Negocios", "Política y Ética", "Robótica", "Agentes de IA"
+    "Empresas y Negocios", "Política y Ética", "Robótica", "Agentes de IA",
+    "Diseño e IA"
 ]
 
 SYSTEM_PROMPT = (
