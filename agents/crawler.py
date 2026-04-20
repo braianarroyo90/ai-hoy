@@ -13,14 +13,24 @@ SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 
 RSS_FEEDS = [
-    {"name": "TechCrunch AI",      "url": "https://techcrunch.com/tag/artificial-intelligence/feed/"},
-    {"name": "VentureBeat AI",     "url": "https://venturebeat.com/ai/feed/"},
-    {"name": "The Verge AI",       "url": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml"},
-    {"name": "MIT Tech Review AI", "url": "https://www.technologyreview.com/feed/"},
-    {"name": "Wired AI",           "url": "https://www.wired.com/feed/tag/ai/latest/rss"},
-    {"name": "Ars Technica",       "url": "https://feeds.arstechnica.com/arstechnica/technology-lab"},
-    {"name": "DeepMind Blog",      "url": "https://deepmind.google/blog/rss.xml"},
-    {"name": "OpenAI Blog",        "url": "https://openai.com/blog/rss.xml"},
+    {"name": "TechCrunch AI",          "url": "https://techcrunch.com/tag/artificial-intelligence/feed/"},
+    {"name": "VentureBeat AI",         "url": "https://venturebeat.com/ai/feed/"},
+    {"name": "The Verge AI",           "url": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml"},
+    {"name": "MIT Tech Review AI",     "url": "https://www.technologyreview.com/feed/"},
+    {"name": "Wired AI",               "url": "https://www.wired.com/feed/tag/ai/latest/rss"},
+    {"name": "Ars Technica",           "url": "https://feeds.arstechnica.com/arstechnica/technology-lab"},
+    {"name": "DeepMind Blog",          "url": "https://deepmind.google/blog/rss.xml"},
+    {"name": "OpenAI Blog",            "url": "https://openai.com/blog/rss.xml"},
+    {"name": "Hugging Face Blog",      "url": "https://huggingface.co/blog/feed.xml"},
+    {"name": "Google AI Blog",         "url": "https://blog.google/technology/ai/rss/"},
+    {"name": "The Batch",              "url": "https://www.deeplearning.ai/the-batch/feed.xml"},
+    {"name": "Towards Data Science",   "url": "https://towardsdatascience.com/feed"},
+    {"name": "AI News",                "url": "https://artificialintelligence-news.com/feed/"},
+    {"name": "Anthropic Blog",         "url": "https://www.anthropic.com/rss.xml"},
+    {"name": "Mistral Blog",           "url": "https://mistral.ai/news/rss"},
+    {"name": "Scale AI Blog",          "url": "https://scale.com/blog/feed"},
+    {"name": "Last Week in AI",        "url": "https://lastweekin.ai/feed"},
+    {"name": "The AI Beat (VentureBeat)", "url": "https://venturebeat.com/category/ai/feed/"},
 ]
 
 AI_KEYWORDS = [
