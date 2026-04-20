@@ -27,8 +27,8 @@ jobs:
           SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
-          VERCEL_TOKEN:         ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID:    ${{ secrets.VERCEL_PROJECT_ID }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          POSTHOG_PROJECT_ID:       ${{ secrets.POSTHOG_PROJECT_ID }}
           GMAIL_USER:           ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD:   ${{ secrets.GMAIL_APP_PASSWORD }}
           REPORT_EMAIL:         ${{ secrets.REPORT_EMAIL }}
