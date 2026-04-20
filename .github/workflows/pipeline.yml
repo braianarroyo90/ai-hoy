@@ -23,6 +23,12 @@ jobs:
           cache: "pip"
           cache-dependency-path: agents/requirements.txt
 
+      - name: Verify checkout
+        run: |
+          git log --oneline -3
+          echo "--- redactor.py first 10 lines ---"
+          head -10 agents/redactor.py
+
       - name: Install dependencies
         run: pip install -r agents/requirements.txt
 
