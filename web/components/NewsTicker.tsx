@@ -15,7 +15,7 @@ export default function NewsTicker({ articles }: { articles: TickerArticle[] }) 
   const items = [...articles, ...articles];
 
   return (
-    <div className="border-b border-zinc-800/60 bg-zinc-950/60 overflow-hidden">
+    <div className="border-y border-zinc-700/50 bg-zinc-800/70 overflow-hidden">
       <div className="flex items-center">
         <span className="shrink-0 px-3 py-1.5 text-[10px] font-semibold tracking-widest uppercase text-blue-400 border-r border-zinc-800">
           Últimas
