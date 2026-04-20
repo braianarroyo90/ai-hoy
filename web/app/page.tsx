@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase, Article } from "@/lib/supabase";
 import ArticleCard from "@/components/ArticleCard";
 import CategoryFilter from "@/components/CategoryFilter";
+import NewsTicker from "@/components/NewsTicker";
 
 export const revalidate = 3600;
 
@@ -85,8 +86,8 @@ export default async function Home({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
     <main className="min-h-screen bg-zinc-950 text-white">
-      <header className="sticky top-0 z-50 border-b border-zinc-800/60 px-6 py-4 backdrop-blur-md bg-zinc-950/85">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-zinc-950/85">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-4 border-b border-zinc-800/60">
           <div>
             <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
               <span className="text-blue-400">AI</span> Hoy
@@ -96,6 +97,7 @@ export default async function Home({
             </p>
           </div>
         </div>
+        <NewsTicker articles={articles.slice(0, 12).map(a => ({ slug: a.slug ?? null, source_url: a.source_url, es_title: a.es_title }))} />
       </header>
 
       <div className="max-w-5xl mx-auto px-6 py-8">
