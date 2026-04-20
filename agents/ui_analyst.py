@@ -25,7 +25,7 @@ REPORT_EMAIL         = os.environ.get("REPORT_EMAIL", GMAIL_USER)
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 claude   = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-VERCEL_ANALYTICS_BASE = "https://vercel.com/api/v2/web/analytics"
+VERCEL_API_BASE = "https://api.vercel.com"
 
 
 # ── 1. Metrics collection ────────────────────────────────────────────────────
@@ -36,31 +36,51 @@ def fetch_vercel_metrics() -> dict:
         print("⚠ Vercel credentials not set — skipping analytics fetch")
         return {}
 
-    now  = datetime.now(timezone.utc)
+    now   = datetime.now(timezone.utc)
     from_ = int((now - timedelta(days=7)).timestamp() * 1000)
     to_   = int(now.timestamp() * 1000)
 
     headers = {"Authorization": f"Bearer {VERCEL_TOKEN}"}
-    params  = {
-        "projectId":   VERCEL_PROJECT_ID,
-        "from":        from_,
-        "to":          to_,
-        "environment": "production",
-        "limit":       20,
-    }
 
     try:
-        # Top pages by views
-        r = requests.get(f"{VERCEL_ANALYTICS_BASE}/pages", headers=headers, params=params, timeout=10)
+        # Verify token + get project info (also reveals teamId if needed)
+        proj = requests.get(
+            f"{VERCEL_API_BASE}/v9/projects/{VERCEL_PROJECT_ID}",
+            headers=headers, timeout=10
+        )
+        proj.raise_for_status()
+        project = proj.json()
+        team_id = project.get("accountId", "")
+        print(f"   Vercel project: {project.get('name')} (team: {team_id})")
+
+        params = {
+            "projectId":   VERCEL_PROJECT_ID,
+            "teamId":      team_id,
+            "from":        from_,
+            "to":          to_,
+            "environment": "production",
+            "limit":       20,
+        }
+
+        # Top pages
+        r = requests.get(
+            f"{VERCEL_API_BASE}/v1/web/analytics/pages",
+            headers=headers, params=params, timeout=10
+        )
         r.raise_for_status()
         pages = r.json().get("data", [])
 
-        # Overall stats (total visitors, bounce rate)
-        r2 = requests.get(f"{VERCEL_ANALYTICS_BASE}/stats", headers=headers, params=params, timeout=10)
+        # Overall stats
+        r2 = requests.get(
+            f"{VERCEL_API_BASE}/v1/web/analytics/stats",
+            headers=headers, params=params, timeout=10
+        )
         r2.raise_for_status()
         stats = r2.json()
 
+        print(f"   Vercel: {len(pages)} páginas, stats OK")
         return {"top_pages": pages[:15], "stats": stats}
+
     except Exception as e:
         print(f"⚠ Vercel API error: {e}")
         return {}
