@@ -523,9 +523,29 @@
     <p>
       Mientras otros medios requieren redactores, editores y community managers, AI Hoy opera
       con un pipeline de IA que procesa noticias de las mejores fuentes internacionales,
-      las traduce al español con calidad editorial y las publica automáticamente.
-      El resultado: cobertura diaria, fresca y de calidad, a costo marginal cero.
+      las traduce al español con calidad editorial y las publica automáticamente en web,
+      Twitter/X y — próximamente — YouTube. El resultado: cobertura diaria en múltiples
+      canales, a costo marginal cero.
     </p>
+  </div>
+
+  <h2>Canales de distribución</h2>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon blue">🌐</div>
+      <h3>Sitio web</h3>
+      <p>ai-hoy.vercel.app — artículos completos en español con SEO, categorías y artículos relacionados. Actualizado diariamente.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:#e0f2fe;">🐦</div>
+      <h3>Twitter / X</h3>
+      <p>@AIHoyES — tweets automáticos de cada artículo publicado con título, link y hashtags por categoría.</p>
+    </div>
+    <div class="card" style="border: 1px dashed #fcd34d; background: #fffbeb;">
+      <div class="card-icon orange">▶️</div>
+      <h3>YouTube Shorts <span class="tag orange" style="font-size:10px;vertical-align:middle;margin-left:4px;">WIP</span></h3>
+      <p>2 Shorts diarios generados con IA: guión, voz, imágenes y montaje totalmente automáticos. En integración.</p>
+    </div>
   </div>
 
   <h2>El problema que resuelve</h2>
@@ -561,10 +581,10 @@
 <!-- PAGE 2: PIPELINE -->
 <div class="page">
   <div class="section-label">Pipeline de Contenido</div>
-  <h1>Cómo se generan las noticias</h1>
+  <h1>Cómo se genera y distribuye el contenido</h1>
   <p class="lead">
-    Cada día a las 9:00 UTC, un pipeline de 3 agentes en cadena transforma feeds RSS
-    de fuentes internacionales en artículos en español listos para publicar.
+    Cada día a las 9:00 UTC, un pipeline de agentes en cadena transforma feeds RSS
+    de fuentes internacionales en contenido en español distribuido en múltiples canales.
   </p>
 
   <div class="flow">
@@ -589,13 +609,33 @@
     <div class="flow-step">
       <div class="icon">🗄️</div>
       <div class="name">Supabase</div>
-      <div class="desc">Guarda en PostgreSQL</div>
+      <div class="desc">PostgreSQL</div>
     </div>
     <div class="flow-arrow">→</div>
     <div class="flow-step">
       <div class="icon">🌐</div>
       <div class="name">Vercel</div>
-      <div class="desc">Sirve el sitio</div>
+      <div class="desc">Sitio web</div>
+    </div>
+  </div>
+
+  <!-- Distribución social: ramales -->
+  <div style="margin: 4px 0 24px; display: flex; gap: 12px; padding-left: 8px;">
+    <div style="width: 4px; background: var(--border); border-radius: 2px; margin-left: 20px;"></div>
+    <div style="flex:1;">
+      <div style="font-size:11px; font-weight:600; color: var(--gray); text-transform:uppercase; letter-spacing:.05em; margin-bottom:10px; padding-left:4px;">Distribución desde Supabase →</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:160px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:14px 16px;">
+          <div style="font-size:18px; margin-bottom:4px;">🐦</div>
+          <div style="font-size:12px; font-weight:600; color:#0369a1;">Twitter Poster</div>
+          <div style="font-size:11px; color:#0284c7; margin-top:2px;">Auto-tweet post pipeline</div>
+        </div>
+        <div style="flex:1; min-width:160px; background:#fffbeb; border:1px dashed #fcd34d; border-radius:10px; padding:14px 16px;">
+          <div style="font-size:18px; margin-bottom:4px;">▶️</div>
+          <div style="font-size:12px; font-weight:600; color:#92400e;">Video Generator <span style="background:#fef3c7;color:#b45309;border:1px solid #fde68a;border-radius:4px;padding:1px 6px;font-size:9px;margin-left:4px;">WIP</span></div>
+          <div style="font-size:11px; color:#b45309; margin-top:2px;">2 Shorts/día → YouTube</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -766,6 +806,18 @@
       </div>
     </div>
     <p>Al finalizar el pipeline de contenido, postea automáticamente hasta 5 artículos nuevos en la cuenta <strong>@AIHoyES</strong> de X/Twitter. Genera tweets con título en español, link al artículo y hashtags según categoría. Marca cada artículo con <code>tweeted_at</code> para no repetir.</p>
+  </div>
+
+  <div class="agent-card" style="border: 1px dashed #fcd34d; background: linear-gradient(135deg,#fffbeb,#fff);">
+    <div class="cron" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">WIP — post pipeline</div>
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#fef3c7;">▶️</div>
+      <div>
+        <h3>Video Generator <span class="tag orange" style="font-size:10px;vertical-align:middle;margin-left:6px;">En desarrollo</span></h3>
+        <div class="trigger">2 YouTube Shorts por día — automático</div>
+      </div>
+    </div>
+    <p>Toma artículos publicados y genera Shorts de ~60 segundos completamente solos: <strong>Claude Haiku</strong> escribe el guión en 5 escenas, <strong>Edge TTS</strong> narra en español argentino, <strong>Pollinations AI</strong> genera una imagen por escena, <strong>FFmpeg</strong> monta el video con efecto Ken Burns y overlay de texto. El resultado se sube automáticamente a YouTube vía <strong>Data API v3</strong> y la URL queda guardada en Supabase.</p>
   </div>
 
   <div class="footer">
