@@ -15,21 +15,40 @@ SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+}
+
 def get_og_image(url: str) -> str | None:
     try:
-        resp = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
+        resp = requests.get(url, timeout=10, headers=HEADERS, allow_redirects=True)
+        if resp.status_code != 200:
+            return None
 
         class OGParser(HTMLParser):
-            image = None
+            og_image      = None
+            twitter_image = None
+
             def handle_starttag(self, tag, attrs):
-                if tag == "meta":
-                    d = dict(attrs)
-                    if d.get("property") == "og:image":
-                        self.image = d.get("content")
+                if tag != "meta":
+                    return
+                d = dict(attrs)
+                prop = d.get("property", "") or d.get("name", "")
+                content = d.get("content", "")
+                if prop == "og:image" and not self.og_image:
+                    self.og_image = content
+                if prop in ("twitter:image", "twitter:image:src") and not self.twitter_image:
+                    self.twitter_image = content
 
         parser = OGParser()
-        parser.feed(resp.text[:20000])
-        return parser.image
+        parser.feed(resp.text[:60000])
+        return parser.og_image or parser.twitter_image or None
     except Exception:
         return None
 
