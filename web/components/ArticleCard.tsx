@@ -16,9 +16,9 @@ export default function ArticleCard({ article, size = "md" }: { article: Article
   const href = article.slug ? `/articulo/${article.slug}` : article.source_url;
   const isInternal = !!article.slug;
 
-  const imageHeight = size === "lg" ? "h-56" : size === "sm" ? "h-32" : "h-44";
-  const titleSize = size === "lg" ? "text-lg" : "text-base";
-  const summaryLines = size === "sm" ? "line-clamp-2" : "line-clamp-4";
+  const imageHeight = size === "lg" ? "h-36 sm:h-56" : size === "sm" ? "h-24 sm:h-32" : "h-32 sm:h-44";
+  const titleSize = size === "lg" ? "text-sm sm:text-lg" : "text-xs sm:text-base";
+  const summaryLines = size === "sm" ? "line-clamp-2" : "line-clamp-3 sm:line-clamp-4";
 
   const content = (
     <>
@@ -41,7 +41,7 @@ export default function ArticleCard({ article, size = "md" }: { article: Article
         </div>
       )}
 
-      <div className="flex flex-col gap-2 p-4 flex-1">
+      <div className="flex flex-col gap-1.5 sm:gap-2 p-3 sm:p-4 flex-1">
         <div className="flex items-center justify-between text-xs text-zinc-500">
           <span>{article.source_name}</span>
           <span>{timeAgo(article.published_at)}</span>
@@ -51,7 +51,7 @@ export default function ArticleCard({ article, size = "md" }: { article: Article
           {article.es_title}
         </h2>
 
-        <p className={`text-xs text-zinc-400 leading-relaxed ${summaryLines}`}>
+        <p className={`text-xs text-zinc-400 leading-relaxed ${summaryLines} hidden sm:block`}>
           {article.es_summary}
         </p>
 

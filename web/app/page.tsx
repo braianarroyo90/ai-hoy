@@ -150,7 +150,7 @@ export default async function Home({
                 <HeroEditorial hero={heroArticle} headlines={headlineList} />
               )}
 
-              <div className="mt-2 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-2 grid gap-3 sm:gap-5 grid-cols-2 lg:grid-cols-3">
                 {(showHero ? gridArticles : articles).map((a, i) => (
                   <>
                     {!category && page === 1 && i === 6 && (
