@@ -10,7 +10,7 @@ import hashlib
 import base64
 import urllib.parse
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 import requests
 from supabase import create_client
@@ -128,13 +128,11 @@ def build_tweet(article: dict) -> str:
 
 
 def get_recent_articles() -> list[dict]:
-    cutoff = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
     result = (
         supabase.from_("articles")
         .select("id, slug, source_url, es_title, category, tweeted_at")
         .eq("status", "published")
         .is_("tweeted_at", "null")
-        .gte("published_at", cutoff)
         .order("published_at", desc=True)
         .limit(MAX_TWEETS)
         .execute()
