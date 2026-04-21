@@ -131,6 +131,13 @@ Respondé SOLO con JSON válido sin markdown:
   "titulo_video": "...",
   "descripcion_youtube": "descripción de 100-150 palabras con hashtags al final",
   "tags_youtube": ["shorts", "inteligenciaartificial", "ia", "noticias"],
+  "prompts_visuales": [
+    "prompt en inglés para imagen de fondo escena 1 — específico al contenido del artículo, sin personas, sin texto, fotorrealista",
+    "prompt en inglés para imagen de fondo escena 2",
+    "prompt en inglés para imagen de fondo escena 3",
+    "prompt en inglés para imagen de fondo escena 4",
+    "prompt en inglés para imagen de fondo escena 5"
+  ],
   "escenas": [
     {"numero": 1, "texto_pantalla": "...", "narracion": "..."},
     {"numero": 2, "texto_pantalla": "...", "narracion": "..."},
@@ -138,7 +145,13 @@ Respondé SOLO con JSON válido sin markdown:
     {"numero": 4, "texto_pantalla": "...", "narracion": "..."},
     {"numero": 5, "texto_pantalla": "...", "narracion": "..."}
   ]
-}"""
+}
+
+Reglas para prompts_visuales:
+- Cada prompt describe una escena visualmente distinta relacionada al artículo
+- En inglés, sin personas, sin caras, sin texto en la imagen
+- Ejemplos: "glowing microchip macro, blue light rays, dark background" / "empty server room with blinking lights, cold blue atmosphere" / "abstract data visualization, orange particles flowing"
+- Variá el tema visual entre escenas (no repitas el mismo concepto 5 veces)"""
 
 def generate_script(article: dict) -> dict:
     user_msg = (
@@ -149,7 +162,7 @@ def generate_script(article: dict) -> dict:
     )
     resp = claude.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=1500,
+        max_tokens=2000,
         system=SCRIPT_SYSTEM,
         messages=[{"role": "user", "content": user_msg}],
     )
@@ -190,26 +203,103 @@ def _wrap_text(draw: ImageDraw.Draw, text: str, font: ImageFont.FreeTypeFont, ma
     return lines
 
 # ── Imagen por escena con Pollinations AI ────────────────────────────
-def generate_scene_image(prompt: str, workdir: Path, idx: int) -> Optional[str]:
-    import urllib.parse
-    # Prompt corto y directo — Pollinations funciona mejor así
-    keywords = prompt[:60].split()[:8]
-    short = " ".join(keywords)
-    full = f"cinematic photography, {short}, AI technology, dramatic lighting, photorealistic, 4k"
+# 5 conceptos visuales distintos por categoría — uno por escena
+SCENE_CONCEPTS = {
+    "Modelos y LLMs": [
+        "glowing server racks in dark data center, blue lights, no people",
+        "abstract floating geometric shapes, deep space, digital particles, blue",
+        "macro circuit board with light trails, green copper traces, dark background",
+        "holographic transparent screens, light refractions, sci-fi control room, no people",
+        "binary code rain, matrix style, deep black background, blue glow",
+    ],
+    "Herramientas y Productos": [
+        "sleek minimalist product on dark background, purple ambient light",
+        "floating 3D interface elements, hologram, dark room, purple glow",
+        "abstract software code on dark screen, syntax highlighting, close up",
+        "futuristic keyboard and peripherals, neon purple light, dark studio",
+        "glowing app icons floating in void, abstract digital products",
+    ],
+    "Investigación": [
+        "science laboratory glassware with colorful liquids, dramatic lighting, no people",
+        "particle accelerator tunnel, circular lights, long exposure, cyan",
+        "mathematical equations projected on dark wall, light beams",
+        "telescope pointed at star field, cosmic nebula, deep space photography",
+        "micro photography of crystal structures, abstract science, teal and blue",
+    ],
+    "Empresas y Negocios": [
+        "skyscraper glass facades reflecting sunset, golden light, upward angle",
+        "abstract stock market graph with golden data streams, dark background",
+        "modern office building exterior at night, amber lights, no people",
+        "global network map with golden connection lines, earth from space",
+        "luxury boardroom table with city view, golden hour light, empty room",
+    ],
+    "Política y Ética": [
+        "grand courthouse columns at night, dramatic red and blue lighting",
+        "scales of justice statue close up, dramatic shadows, no people",
+        "abstract binary code forming a shield, red and blue, dark background",
+        "empty parliament hall at night, red ambient light, architecture",
+        "digital fingerprint dissolving into particles, red and dark tones",
+    ],
+    "Robótica": [
+        "robotic arm industrial close up, sparks, dark workshop, green tones",
+        "macro shot of mechanical gears, oil reflections, metallic texture",
+        "drone flying over dark landscape, green LED lights, long exposure",
+        "abstract exoskeleton mechanical design, technical blueprint aesthetic",
+        "circuit board macro, solder points glowing, green on black",
+    ],
+    "Agentes de IA": [
+        "abstract network of glowing orange nodes connected by light threads",
+        "spider web of data connections, warm orange light, dark void",
+        "multiple screens in dark room showing dashboards, amber light, no people",
+        "autonomous vehicle sensors visualization, orange radar waves, night",
+        "drone swarm forming pattern, long exposure trails, dark sky, orange",
+    ],
+    "Diseño e IA": [
+        "abstract generative art, colorful fluid simulation, pink and purple",
+        "digital canvas with brush strokes dissolving into pixels, pink tones",
+        "neon color palette swatches floating, abstract art studio, dark",
+        "3D render abstract sculpture, smooth curves, pink and magenta light",
+        "macro paint drops in water, high speed photography, vivid colors",
+    ],
+}
+_DEFAULT_CONCEPTS = [
+    "abstract AI technology, blue particles, dark background",
+    "futuristic digital landscape, glowing nodes, dark void",
+    "data visualization abstract, colorful streams, dark background",
+    "macro circuit board, light reflections, dark studio",
+    "deep space with digital elements, cosmic technology",
+]
+
+def generate_scene_image(prompt: str, article_title: str, workdir: Path, idx: int) -> Optional[str]:
+    import urllib.parse, time
+    full = (
+        f"{prompt}, no people, no faces, no humans, no text, "
+        f"photorealistic, 4k, cinematic, dark moody atmosphere"
+    )
     encoded = urllib.parse.quote(full)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1080&height=1920&nologo=true&seed={idx * 137}"
-    try:
-        r = requests.get(url, timeout=60, headers={"User-Agent": "Mozilla/5.0"})
-        if r.status_code == 200 and len(r.content) > 20_000:
-            p = workdir / f"scene_bg_{idx:02d}.jpg"
-            p.write_bytes(r.content)
-            # Verificar que Pillow puede abrirla
-            Image.open(p).verify()
-            return str(p)
-        else:
-            print(f" [pollinations {r.status_code}, {len(r.content)} bytes]", end="")
-    except Exception as e:
-        print(f" [pollinations error: {e}]", end="")
+    seed = (idx * 97 + abs(hash(article_title[:20])) % 500) % 9999
+    url = (
+        f"https://image.pollinations.ai/prompt/{encoded}"
+        f"?width=1080&height=1920&nologo=true&seed={seed}"
+    )
+    for attempt in range(3):
+        try:
+            r = requests.get(url, timeout=90, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code == 200 and len(r.content) > 20_000:
+                p = workdir / f"scene_bg_{idx:02d}.jpg"
+                p.write_bytes(r.content)
+                Image.open(p).verify()
+                return str(p)
+            elif r.status_code == 429:
+                wait = 15 * (attempt + 1)
+                print(f" [429 → espera {wait}s]", end="", flush=True)
+                time.sleep(wait)
+            else:
+                print(f" [pollinations {r.status_code}]", end="")
+                break
+        except Exception as e:
+            print(f" [error: {e}]", end="")
+            break
     return None
 
 # ── Fondo bokeh procedural (fallback cinematográfico) ─────────────────
@@ -420,17 +510,13 @@ _KB_MOVES = [
 def create_scene_video(bg_frame: Path, text_frame: Path, audio: Path, duration: float, out: Path, idx: int = 0):
     fps = 25
     n = int(duration * fps)
-    fade = 0.3
-
     z_expr, x_expr, y_expr = _KB_MOVES[idx % len(_KB_MOVES)]
 
-    # scale con object-fit:cover (sin apretar): escala hasta cubrir WxH y recorta el exceso
+    # Sin fade — las transiciones las maneja xfade al concatenar
     filter_complex = (
         f"[0:v]scale={W}:{H}:force_original_aspect_ratio=increase,"
         f"crop={W}:{H},"
-        f"zoompan=z='{z_expr}':x='{x_expr}':y='{y_expr}':d={n}:s={W}x{H}:fps={fps},"
-        f"fade=t=in:st=0:d={fade},"
-        f"fade=t=out:st={max(duration - fade, 0)}:d={fade}[bg];"
+        f"zoompan=z='{z_expr}':x='{x_expr}':y='{y_expr}':d={n}:s={W}x{H}:fps={fps}[bg];"
         f"[bg][1:v]overlay=0:0[v]"
     )
 
@@ -450,13 +536,49 @@ def create_scene_video(bg_frame: Path, text_frame: Path, audio: Path, duration: 
         str(out),
     ], check=True, capture_output=True)
 
-def concat_videos(parts: List[Path], out: Path, workdir: Path):
-    list_file = workdir / "concat.txt"
-    list_file.write_text("\n".join(f"file '{p}'" for p in parts))
+# Transiciones xfade por par de escenas
+_XFADE_TRANSITIONS = ["fade", "slideleft", "dissolve", "slideright", "fadeblack"]
+
+def concat_videos(parts: List[Path], durations: List[float], out: Path):
+    if len(parts) == 1:
+        import shutil
+        shutil.copy(parts[0], out)
+        return
+
+    T = 0.4  # duración de cada transición en segundos
+    inputs = []
+    for p in parts:
+        inputs += ["-i", str(p)]
+
+    # xfade encadenado: cada transición toma el output anterior + el siguiente clip
+    filter_v = []
+    cumulative = 0.0
+    for i in range(len(parts) - 1):
+        transition = _XFADE_TRANSITIONS[i % len(_XFADE_TRANSITIONS)]
+        offset = cumulative + durations[i] - T - (i * T)
+        in_a = f"[xf{i-1}]" if i > 0 else "[0:v]"
+        in_b = f"[{i+1}:v]"
+        out_label = f"[xf{i}]" if i < len(parts) - 2 else "[vout]"
+        filter_v.append(
+            f"{in_a}{in_b}xfade=transition={transition}:duration={T}:offset={max(offset,0):.3f}{out_label}"
+        )
+        cumulative += durations[i]
+
+    # Audio: concat simple de todas las pistas
+    audio_inputs = "".join(f"[{i}:a]" for i in range(len(parts)))
+    filter_a = f"{audio_inputs}concat=n={len(parts)}:v=0:a=1[aout]"
+
+    filter_complex = ";".join(filter_v) + ";" + filter_a
+
     subprocess.run([
         "ffmpeg", "-y",
-        "-f", "concat", "-safe", "0", "-i", str(list_file),
-        "-c", "copy",
+        *inputs,
+        "-filter_complex", filter_complex,
+        "-map", "[vout]",
+        "-map", "[aout]",
+        "-c:v", "libx264", "-preset", "fast",
+        "-c:a", "aac", "-b:a", "128k",
+        "-pix_fmt", "yuv420p",
         str(out),
     ], check=True, capture_output=True)
 
@@ -525,21 +647,23 @@ def process_article(article: dict, yt) -> str:
         # 2. Imagen de fondo
         bg_path = download_bg_image(article.get("og_image"), workdir)
 
-        # 3. Descargar todas las imágenes de Pollinations en paralelo
+        # 3. Descargar imágenes secuencialmente (Pollinations rate-limita paralelas)
+        import time as _time
         escenas = script["escenas"]
-        print(f"  Descargando {len(escenas)} imágenes en paralelo...")
-        scene_imgs = [None] * len(escenas)
-        with ThreadPoolExecutor(max_workers=5) as ex:
-            futures = {ex.submit(generate_scene_image, s["narracion"][:80], workdir, i): i
-                       for i, s in enumerate(escenas)}
-            for fut in as_completed(futures):
-                i = futures[fut]
-                scene_imgs[i] = fut.result()
-                status = "OK" if scene_imgs[i] else "fallback bokeh"
-                print(f"    Escena {i+1}: {status}")
+        visual_prompts = script.get("prompts_visuales", [])
+        print(f"  Descargando {len(escenas)} imágenes de Pollinations...")
+        scene_imgs = []
+        for i, _ in enumerate(escenas):
+            if i > 0:
+                _time.sleep(4)
+            prompt = visual_prompts[i] if i < len(visual_prompts) else f"AI technology abstract scene {i+1}"
+            img = generate_scene_image(prompt, article["es_title"], workdir, i)
+            scene_imgs.append(img)
+            print(f"    Escena {i+1}: {'OK' if img else 'fallback bokeh'}")
 
         # 4. Escenas: TTS + dos capas + Ken Burns
         scene_videos = []
+        scene_durations = []
         for i, scene in enumerate(escenas):
             print(f"  Escena {i+1}/5: {scene['texto_pantalla'][:30]}...")
 
@@ -554,11 +678,12 @@ def process_article(article: dict, yt) -> str:
             scene_video = workdir / f"scene_{i:02d}.mp4"
             create_scene_video(bg_frame, txt_frame, audio_path, duration, scene_video, idx=i)
             scene_videos.append(scene_video)
+            scene_durations.append(duration)
 
-        # 4. Concatenar todas las escenas
-        print("  Montando video final...")
+        # 5. Concatenar con transiciones xfade
+        print("  Montando video final con transiciones...")
         final_video = workdir / "final.mp4"
-        concat_videos(scene_videos, final_video, workdir)
+        concat_videos(scene_videos, scene_durations, final_video)
         size_mb = final_video.stat().st_size / 1_048_576
         print(f"  Video listo: {size_mb:.1f} MB")
 

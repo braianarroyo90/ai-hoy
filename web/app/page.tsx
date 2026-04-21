@@ -4,6 +4,7 @@ import ArticleCard from "@/components/ArticleCard";
 import CategoryNav from "@/components/CategoryNav";
 import HeroEditorial from "@/components/HeroEditorial";
 import NewsTicker from "@/components/NewsTicker";
+import ShortsSection from "@/components/ShortsSection";
 
 export const revalidate = 3600;
 
@@ -70,10 +71,16 @@ export default async function Home({
   const category = params.category;
   const page     = Math.max(1, parseInt(params.page ?? "1", 10));
 
-  const [{ articles, total }, counts] = await Promise.all([
+  const [{ articles, total }, counts, shortsData] = await Promise.all([
     getArticles(category, page),
     getCategoryCounts(),
+    supabase
+      .from("youtube_shorts")
+      .select("id, title, channel, thumbnail, published_at")
+      .order("published_at", { ascending: false })
+      .limit(20),
   ]);
+  const shorts = (shortsData.data ?? []) as { id: string; title: string; channel: string; thumbnail: string; published_at: string }[];
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   // Hero must have an image — pick the first article that does
@@ -144,6 +151,10 @@ export default async function Home({
                   <ArticleCard key={a.id} article={a} size={getCardSize(i)} />
                 ))}
               </div>
+
+              {!category && page === 1 && (
+                <ShortsSection shorts={shorts} />
+              )}
 
               {totalPages > 1 && (
                 <div className="mt-10 flex items-center justify-center gap-3">

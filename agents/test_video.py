@@ -73,21 +73,24 @@ def main():
 
     # 3. Escenas
     from video_generator import generate_scene_image, create_bg_frame, create_text_overlay
-    from concurrent.futures import ThreadPoolExecutor, as_completed
+    import time as _time
 
-    # Descargar todas las imágenes en paralelo
     escenas = script["escenas"]
-    print(f"3. Descargando {len(escenas)} imágenes Pollinations en paralelo...")
-    scene_imgs = [None] * len(escenas)
-    with ThreadPoolExecutor(max_workers=5) as ex:
-        futures = {ex.submit(generate_scene_image, s["narracion"][:80], workdir, i): i
-                   for i, s in enumerate(escenas)}
-        for fut in as_completed(futures):
-            i = futures[fut]
-            scene_imgs[i] = fut.result()
-            print(f"   Escena {i+1}: {'OK' if scene_imgs[i] else 'fallback bokeh'}")
+    visual_prompts = script.get("prompts_visuales", [])
+    print(f"3. Descargando {len(escenas)} imágenes Pollinations (secuencial)...")
+    for i, p in enumerate(visual_prompts):
+        print(f"   Prompt {i+1}: {p[:70]}")
+    scene_imgs = []
+    for i, _ in enumerate(escenas):
+        if i > 0:
+            _time.sleep(4)
+        prompt = visual_prompts[i] if i < len(visual_prompts) else "AI technology abstract"
+        img = generate_scene_image(prompt, ARTICLE["es_title"], workdir, i)
+        scene_imgs.append(img)
+        print(f"   Escena {i+1}: {'OK' if img else 'fallback bokeh'}")
 
     scene_videos = []
+    scene_durations = []
     for i, scene in enumerate(escenas):
         print(f"\n   Procesando escena {i+1}/5: '{scene['texto_pantalla']}'")
 
@@ -112,10 +115,11 @@ def main():
         create_scene_video(bg_frame, txt_frame, audio_path, duration, scene_video, idx=i)
         print(f"OK")
         scene_videos.append(scene_video)
+        scene_durations.append(duration)
 
-    # 4. Concat final
-    print(f"\n4. Montando video final...")
-    concat_videos(scene_videos, OUTPUT, workdir)
+    # 4. Concat con transiciones xfade
+    print(f"\n4. Montando video con transiciones xfade...")
+    concat_videos(scene_videos, scene_durations, OUTPUT)
     size_mb = OUTPUT.stat().st_size / 1_048_576
     print(f"   Listo: {OUTPUT}")
     print(f"   Tamaño: {size_mb:.1f} MB")
