@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { supabase, Article } from "@/lib/supabase";
+import { supabase, Article, RadarReport } from "@/lib/supabase";
 import ArticleCard from "@/components/ArticleCard";
 import CategoryNav from "@/components/CategoryNav";
 import HeroEditorial from "@/components/HeroEditorial";
 import NewsTicker from "@/components/NewsTicker";
 import ShortsSection from "@/components/ShortsSection";
+import RadarCard from "@/components/RadarCard";
 
 export const revalidate = 3600;
 
@@ -71,7 +72,7 @@ export default async function Home({
   const category = params.category;
   const page     = Math.max(1, parseInt(params.page ?? "1", 10));
 
-  const [{ articles, total }, counts, shortsData] = await Promise.all([
+  const [{ articles, total }, counts, shortsData, radarData] = await Promise.all([
     getArticles(category, page),
     getCategoryCounts(),
     supabase
@@ -79,7 +80,14 @@ export default async function Home({
       .select("id, title, channel, thumbnail, published_at")
       .order("published_at", { ascending: false })
       .limit(20),
+    supabase
+      .from("radar_reports")
+      .select("*")
+      .order("published_at", { ascending: false })
+      .limit(1)
+      .single(),
   ]);
+  const radar = radarData.data as RadarReport | null;
   const MOCK_SHORTS = [
     { id: "dQw4w9WgXcQ", title: "Video de prueba — los reales cargan desde Supabase", channel: "AI Hoy", thumbnail: "", published_at: new Date().toISOString() },
   ];
@@ -133,6 +141,13 @@ export default async function Home({
                 Noticias de inteligencia artificial en español
               </p>
             </div>
+            <Link
+              href="/radar"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/15 border border-blue-500/30 hover:bg-blue-600/25 transition-colors"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="text-blue-400 text-xs font-semibold tracking-wide">El Radar</span>
+            </Link>
           </div>
           <NewsTicker articles={articles.slice(0, 12).map(a => ({ slug: a.slug ?? null, source_url: a.source_url, es_title: a.es_title }))} />
         </header>
@@ -140,6 +155,10 @@ export default async function Home({
         <CategoryNav active={category} categories={CATEGORIES} counts={counts} />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {!category && page === 1 && radar && (
+            <RadarCard radar={radar} />
+          )}
+
           {articles.length === 0 ? (
             <p className="text-zinc-500 text-center mt-20">
               No hay artículos todavía. El pipeline corre cada 6 horas.
