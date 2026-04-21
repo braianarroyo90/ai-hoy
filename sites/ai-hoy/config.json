@@ -1,0 +1,74 @@
+{
+  "site_id": "ai-hoy",
+  "name": "AI Hoy",
+  "tagline": "Noticias de inteligencia artificial en español",
+  "topic": "inteligencia artificial y tecnología",
+  "language": "es",
+  "locale": "es-AR",
+  "tts_voice": "es-AR-TomasNeural",
+  "accent_color": "#3b82f6",
+  "url": "https://ai-hoy.vercel.app",
+
+  "categories": [
+    "Modelos y LLMs",
+    "Herramientas y Productos",
+    "Investigación",
+    "Empresas y Negocios",
+    "Política y Ética",
+    "Robótica",
+    "Agentes de IA",
+    "Diseño e IA"
+  ],
+
+  "rss_sources": [
+    "https://techcrunch.com/feed/",
+    "https://www.theverge.com/rss/index.xml",
+    "https://feeds.arstechnica.com/arstechnica/index",
+    "https://www.wired.com/feed/rss",
+    "https://venturebeat.com/feed/",
+    "https://bdtechtalks.com/feed/",
+    "https://the-decoder.com/feed/"
+  ],
+
+  "features": {
+    "crawler":         true,
+    "curator":         true,
+    "redactor":        true,
+    "twitter_poster":  true,
+    "video_shorts":    true,
+    "youtube_curator": true,
+    "radar":           true,
+    "ai_hoy_live":     false
+  },
+
+  "twitter": {
+    "hashtags": {
+      "Modelos y LLMs":        "#IA #LLM #MachineLearning",
+      "Herramientas y Productos": "#IA #Tecnología #AITools",
+      "Investigación":         "#AIResearch #IA #Ciencia",
+      "Empresas y Negocios":   "#IA #Startups #Tech",
+      "Política y Ética":      "#IAÉtica #RegulacionIA #IA",
+      "Robótica":              "#Robótica #IA #Automatización",
+      "Agentes de IA":         "#AIAgents #IA #Automatización",
+      "Diseño e IA":           "#DesignAI #IA #Creatividad"
+    }
+  },
+
+  "prompts": {
+    "editorial_voice": "Sos un periodista especializado en inteligencia artificial escribiendo para una audiencia hispanohablante técnica pero no académica.",
+    "curator_topic": "inteligencia artificial, machine learning, modelos de lenguaje, robótica, startups de IA y política tecnológica",
+    "radar_voice": "Sos el editor jefe del medio de noticias de IA más importante en español.",
+    "video_style": "tecnológico, futurista, abstracto, sin personas ni caras"
+  },
+
+  "youtube": {
+    "channel": "@AIHoyES",
+    "shorts_per_day": 2,
+    "search_queries": [
+      "inteligencia artificial noticias",
+      "AI news español",
+      "openai novedades",
+      "modelos IA 2024"
+    ]
+  }
+}

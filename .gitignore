@@ -12,6 +12,7 @@ env/
 !package-lock.json
 !tsconfig*.json
 !next.config*.json
+!sites/**/*.json
 agents/token.json
 
 # Environment files
