@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import RelatedArticles from "@/components/RelatedArticles";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -138,6 +139,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 </span>
               ))}
             </div>
+          )}
+
+          {article.category && article.slug && (
+            <RelatedArticles category={article.category} excludeSlug={article.slug} />
           )}
 
           <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center justify-between flex-wrap gap-4">
