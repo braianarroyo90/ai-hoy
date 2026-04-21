@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>AI Hoy — Documentación del Sistema</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  :root {
+    --blue: #3b82f6;
+    --blue-light: #eff6ff;
+    --dark: #0f172a;
+    --gray: #64748b;
+    --gray-light: #f8fafc;
+    --border: #e2e8f0;
+    --green: #10b981;
+    --purple: #8b5cf6;
+    --orange: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--dark);
+    background: white;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+    color: white;
+    padding: 80px 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .cover-top { position: relative; }
+
+  .cover-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .cover-logo span { color: var(--blue); }
+
+  .cover-tagline {
+    color: #94a3b8;
+    font-size: 16px;
+    margin-bottom: 60px;
+  }
+
+  .cover-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 600px;
+  }
+
+  .cover-subtitle {
+    color: #94a3b8;
+    font-size: 18px;
+    max-width: 500px;
+  }
+
+  .cover-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 60px;
+    position: relative;
+  }
+
+  .cover-stat { text-align: left; }
+  .cover-stat .number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+  .cover-stat .label {
+    color: #64748b;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .cover-bottom {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: #475569;
+    font-size: 12px;
+  }
+
+  .cover-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: #93c5fd;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  /* CONTENT PAGES */
+  .page {
+    padding: 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    page-break-after: always;
+  }
+
+  .page:last-child { page-break-after: auto; }
+
+  /* SECTION HEADER */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+
+  p { color: #475569; margin-bottom: 16px; }
+
+  .lead {
+    font-size: 16px;
+    color: #64748b;
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  /* DIVIDER */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* CARDS GRID */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .card {
+    background: var(--gray-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .card-icon.blue { background: var(--blue-light); }
+  .card-icon.green { background: #ecfdf5; }
+  .card-icon.purple { background: #f5f3ff; }
+  .card-icon.orange { background: #fffbeb; }
+
+  .card h3 { margin-bottom: 6px; }
+  .card p { font-size: 13px; margin-bottom: 0; color: #64748b; }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+
+  .flow-step {
+    flex: 1;
+    text-align: center;
+    padding: 16px 12px;
+    background: var(--gray-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-width: 100px;
+  }
+
+  .flow-step .icon { font-size: 24px; margin-bottom: 6px; }
+  .flow-step .name { font-size: 12px; font-weight: 600; color: var(--dark); }
+  .flow-step .desc { font-size: 10px; color: var(--gray); margin-top: 2px; }
+
+  .flow-arrow {
+    color: #cbd5e1;
+    font-size: 20px;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* TECH STACK TABLE */
+  .stack-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+
+  .stack-table th {
+    background: var(--gray-light);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray);
+  }
+
+  .stack-table td {
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    color: #475569;
+  }
+
+  .stack-table tr:hover td { background: #fafafa; }
+
+  .tag {
+    display: inline-block;
+    background: var(--blue-light);
+    color: var(--blue);
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .tag.green { background: #ecfdf5; color: var(--green); }
+  .tag.purple { background: #f5f3ff; color: var(--purple); }
+  .tag.orange { background: #fffbeb; color: var(--orange); }
+
+  /* HIGHLIGHT BOX */
+  .highlight {
+    background: linear-gradient(135deg, var(--blue-light) 0%, #f0f9ff 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+
+  .highlight h3 { color: #1d4ed8; margin-bottom: 8px; }
+  .highlight p { color: #1e40af; margin-bottom: 0; font-size: 13px; }
+
+  /* FEATURE LIST */
+  .feature-list { list-style: none; margin: 16px 0; }
+  .feature-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #475569;
+    font-size: 13px;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list li::before {
+    content: '✓';
+    color: var(--green);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* METRIC CARDS */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .metric-card {
+    background: var(--dark);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .metric-card .value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--blue);
+    display: block;
+  }
+
+  .metric-card .label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  /* AGENT CARDS */
+  .agent-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .agent-card .agent-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .agent-card .agent-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--blue-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  .agent-card h3 { margin-bottom: 2px; }
+  .agent-card .trigger {
+    font-size: 11px;
+    color: var(--gray);
+  }
+
+  .agent-card p { font-size: 13px; margin-bottom: 0; }
+
+  .agent-card .cron {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--gray);
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #94a3b8;
+    font-size: 11px;
+  }
+
+  .footer-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--dark);
+  }
+
+  .footer-logo span { color: var(--blue); }
+
+  /* PRINT */
+  @media print {
+    body { font-size: 12px; }
+    .cover { min-height: auto; padding: 60px 50px; }
+    .page { padding: 50px; }
+    .cover-title { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-logo"><span>AI</span> Hoy</div>
+    <div class="cover-tagline">ai-hoy.vercel.app</div>
+
+    <div class="cover-title">
+      El primer medio de noticias de IA<br>completamente automatizado en español
+    </div>
+    <div class="cover-subtitle">
+      Documentación técnica del sistema — arquitectura, pipelines, agentes y stack tecnológico
+    </div>
+
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="number">100%</div>
+        <div class="label">Automatizado</div>
+      </div>
+      <div class="cover-stat">
+        <div class="number">9</div>
+        <div class="label">Agentes activos</div>
+      </div>
+      <div class="cover-stat">
+        <div class="number">8</div>
+        <div class="label">Categorías IA</div>
+      </div>
+      <div class="cover-stat">
+        <div class="number">$0</div>
+        <div class="label">Costo operativo base</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-badges">
+      <span class="badge">Next.js 16</span>
+      <span class="badge">Supabase</span>
+      <span class="badge">Claude AI</span>
+      <span class="badge">GitHub Actions</span>
+      <span class="badge">Vercel</span>
+      <span class="badge">PostHog</span>
+    </div>
+    <div>Abril 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 1: OVERVIEW -->
+<div class="page">
+  <div class="section-label">Visión General</div>
+  <h1>¿Qué es AI Hoy?</h1>
+  <p class="lead">
+    AI Hoy es un medio digital de noticias de inteligencia artificial en español,
+    construido sobre una arquitectura de agentes autónomos que crawlea, cura, traduce
+    y publica contenido sin intervención humana — todos los días.
+  </p>
+
+  <div class="highlight">
+    <h3>Propuesta de valor</h3>
+    <p>
+      Mientras otros medios requieren redactores, editores y community managers, AI Hoy opera
+      con un pipeline de IA que procesa noticias de las mejores fuentes internacionales,
+      las traduce al español con calidad editorial y las publica automáticamente.
+      El resultado: cobertura diaria, fresca y de calidad, a costo marginal cero.
+    </p>
+  </div>
+
+  <h2>El problema que resuelve</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-icon blue">🌐</div>
+      <h3>Barrera del idioma</h3>
+      <p>El 90% de las noticias de IA se publican en inglés. Millones de hispanohablantes no tienen acceso a cobertura de calidad en su idioma.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon orange">⏱️</div>
+      <h3>Velocidad de información</h3>
+      <p>El sector de IA evoluciona a diario. Los medios tradicionales no pueden mantener el ritmo sin un equipo editorial costoso.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">💰</div>
+      <h3>Costo de operación</h3>
+      <p>Un medio tradicional requiere inversión continua en redactores. AI Hoy opera con costos de API de IA, hosting y dominio.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon purple">🎯</div>
+      <h3>Audiencia desatendida</h3>
+      <p>Desarrolladores, emprendedores y profesionales de habla hispana que siguen la IA de cerca no tienen un referente local consolidado.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 2: PIPELINE -->
+<div class="page">
+  <div class="section-label">Pipeline de Contenido</div>
+  <h1>Cómo se generan las noticias</h1>
+  <p class="lead">
+    Cada día a las 9:00 UTC, un pipeline de 3 agentes en cadena transforma feeds RSS
+    de fuentes internacionales en artículos en español listos para publicar.
+  </p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="icon">🕷️</div>
+      <div class="name">Crawler</div>
+      <div class="desc">Crawlea RSS feeds</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">🔍</div>
+      <div class="name">Curator</div>
+      <div class="desc">Filtra y deduplica</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">✍️</div>
+      <div class="name">Redactor</div>
+      <div class="desc">Traduce con Claude</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">🗄️</div>
+      <div class="name">Supabase</div>
+      <div class="desc">Guarda en PostgreSQL</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">🌐</div>
+      <div class="name">Vercel</div>
+      <div class="desc">Sirve el sitio</div>
+    </div>
+  </div>
+
+  <h2>Detalle de cada agente</h2>
+
+  <div class="agent-card">
+    <div class="cron">cron: 0 9 * * *</div>
+    <div class="agent-header">
+      <div class="agent-icon">🕷️</div>
+      <div>
+        <h3>Crawler</h3>
+        <div class="trigger">Se ejecuta diariamente a las 9:00 UTC</div>
+      </div>
+    </div>
+    <p>Crawlea múltiples feeds RSS de medios de tecnología e IA internacionales (TechCrunch AI, The Verge, Ars Technica, Wired, etc.). Filtra artículos de las últimas 24 horas y los almacena como candidatos en Supabase con estado <code>pending</code>.</p>
+  </div>
+
+  <div class="agent-card">
+    <div class="cron">encadenado al crawler</div>
+    <div class="agent-header">
+      <div class="agent-icon">🔍</div>
+      <div>
+        <h3>Curator</h3>
+        <div class="trigger">Posterior al crawler</div>
+      </div>
+    </div>
+    <p>Evalúa los artículos candidatos para eliminar duplicados (por URL y similitud de título), verificar relevancia temática de IA, y seleccionar los mejores para publicación. Actualiza el estado a <code>curated</code> o <code>rejected</code>.</p>
+  </div>
+
+  <div class="agent-card">
+    <div class="cron">máx. 10 artículos/run</div>
+    <div class="agent-header">
+      <div class="agent-icon">✍️</div>
+      <div>
+        <h3>Redactor</h3>
+        <div class="trigger">Procesa artículos curados</div>
+      </div>
+    </div>
+    <p>Usa <strong>Claude Sonnet 4.6</strong> para traducir el título y resumen al español con tono periodístico, asignar categoría temática (entre 8 categorías), generar un slug amigable para SEO, y marcar el artículo como <code>published</code>.</p>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 3: FRONTEND -->
+<div class="page">
+  <div class="section-label">Frontend</div>
+  <h1>El sitio web</h1>
+  <p class="lead">
+    Interfaz editorial moderna construida en Next.js 16 con App Router,
+    diseñada para máxima legibilidad y performance, desplegada en Vercel.
+  </p>
+
+  <h2>Páginas y componentes clave</h2>
+
+  <table class="stack-table">
+    <thead>
+      <tr>
+        <th>Componente</th>
+        <th>Descripción</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Home (page.tsx)</strong></td>
+        <td>Grilla editorial con hero destacado, categorías y paginación</td>
+        <td><span class="tag">Server Component</span></td>
+      </tr>
+      <tr>
+        <td><strong>HeroEditorial</strong></td>
+        <td>Artículo destacado a pantalla completa con imagen y titulares secundarios</td>
+        <td><span class="tag green">Client Component</span></td>
+      </tr>
+      <tr>
+        <td><strong>ArticleCard</strong></td>
+        <td>Card con 3 tamaños (lg/md/sm) en patrón editorial rotativo cada 7 artículos</td>
+        <td><span class="tag">Server Component</span></td>
+      </tr>
+      <tr>
+        <td><strong>CategoryNav</strong></td>
+        <td>Barra de categorías sticky con conteo de artículos por categoría</td>
+        <td><span class="tag green">Client Component</span></td>
+      </tr>
+      <tr>
+        <td><strong>NewsTicker</strong></td>
+        <td>Ticker de noticias animado en tiempo real — pausa en hover</td>
+        <td><span class="tag green">Client Component</span></td>
+      </tr>
+      <tr>
+        <td><strong>Artículo /articulo/[slug]</strong></td>
+        <td>Página de artículo completa con cuerpo, metadatos SEO y artículos relacionados</td>
+        <td><span class="tag">Server Component</span></td>
+      </tr>
+      <tr>
+        <td><strong>RelatedArticles</strong></td>
+        <td>Grid de 3 artículos de la misma categoría al final de cada artículo</td>
+        <td><span class="tag">Server Component</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>SEO y distribución</h2>
+  <div class="grid-2">
+    <ul class="feature-list">
+      <li>sitemap.xml generado dinámicamente desde Supabase</li>
+      <li>robots.txt configurado para crawlers</li>
+      <li>Open Graph tags en cada artículo (imagen, título, descripción)</li>
+      <li>JSON-LD structured data (Article + WebSite schema)</li>
+    </ul>
+    <ul class="feature-list">
+      <li>URLs semánticas: /articulo/[slug-en-español]</li>
+      <li>ISR: revalidación automática cada hora</li>
+      <li>Meta description única por artículo</li>
+      <li>Canonical URLs para evitar contenido duplicado</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 4: AGENTES EXTRA -->
+<div class="page">
+  <div class="section-label">Agentes Inteligentes</div>
+  <h1>Más allá del pipeline</h1>
+  <p class="lead">
+    Además del pipeline de contenido, el sistema cuenta con agentes especializados
+    que mejoran la experiencia, impulsan el crecimiento y analizan métricas.
+  </p>
+
+  <div class="agent-card">
+    <div class="cron">workflow_dispatch</div>
+    <div class="agent-header">
+      <div class="agent-icon">🖼️</div>
+      <div>
+        <h3>Backfill Images</h3>
+        <div class="trigger">Ejecución manual o programada</div>
+      </div>
+    </div>
+    <p>Detecta artículos publicados sin imagen OG y las recupera automáticamente. Usa scraping estático primero (parser HTML) y, como fallback, la API de Microlink para sitios renderizados con JavaScript. Actualiza Supabase con la URL de imagen encontrada.</p>
+  </div>
+
+  <div class="agent-card">
+    <div class="cron">Lunes 10:00 UTC</div>
+    <div class="agent-header">
+      <div class="agent-icon">📊</div>
+      <div>
+        <h3>UI Analyst</h3>
+        <div class="trigger">Semanal — análisis + propuestas</div>
+      </div>
+    </div>
+    <p>Consulta métricas de <strong>PostHog</strong> (pageviews, dispositivos, bounce rate) y datos de <strong>Supabase</strong> (categorías más leídas, artículos recientes). Luego pide a Claude que analice los datos y genere <strong>3 propuestas concretas de mejora de UI/UX</strong>, que envía por email en formato HTML para revisión manual antes de implementar.</p>
+  </div>
+
+  <div class="agent-card">
+    <div class="cron">post pipeline</div>
+    <div class="agent-header">
+      <div class="agent-icon">🐦</div>
+      <div>
+        <h3>Twitter Poster</h3>
+        <div class="trigger">Automático después de cada pipeline</div>
+      </div>
+    </div>
+    <p>Al finalizar el pipeline de contenido, postea automáticamente hasta 5 artículos nuevos en la cuenta <strong>@AIHoyES</strong> de X/Twitter. Genera tweets con título en español, link al artículo y hashtags según categoría. Marca cada artículo con <code>tweeted_at</code> para no repetir.</p>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 5: TECH STACK -->
+<div class="page">
+  <div class="section-label">Arquitectura Técnica</div>
+  <h1>Stack tecnológico</h1>
+  <p class="lead">
+    Construido sobre tecnologías modernas, open-source y con generosos planes gratuitos
+    que permiten operar el sistema a costo mínimo.
+  </p>
+
+  <table class="stack-table">
+    <thead>
+      <tr>
+        <th>Capa</th>
+        <th>Tecnología</th>
+        <th>Rol</th>
+        <th>Plan</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Frontend</td>
+        <td><strong>Next.js 16</strong> + Tailwind v4</td>
+        <td>Sitio web con App Router + Server Components</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Hosting</td>
+        <td><strong>Vercel</strong></td>
+        <td>Deploy automático desde GitHub, CDN global</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Base de datos</td>
+        <td><strong>Supabase</strong> (PostgreSQL)</td>
+        <td>Almacena artículos, estado, metadatos</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>IA / LLM</td>
+        <td><strong>Anthropic Claude</strong> Sonnet 4.6</td>
+        <td>Traducción, categorización, análisis UI</td>
+        <td><span class="tag orange">Pay-per-use</span></td>
+      </tr>
+      <tr>
+        <td>CI/CD + Agentes</td>
+        <td><strong>GitHub Actions</strong></td>
+        <td>Ejecuta pipeline y agentes con cron</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Analytics</td>
+        <td><strong>PostHog</strong></td>
+        <td>Pageviews, sesiones, dispositivos, bounce rate</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Distribución social</td>
+        <td><strong>Twitter/X API</strong> + Tweepy</td>
+        <td>Auto-posting en @AIHoyES</td>
+        <td><span class="tag orange">Créditos</span></td>
+      </tr>
+      <tr>
+        <td>Imágenes</td>
+        <td><strong>Microlink API</strong></td>
+        <td>Extracción OG images de sitios JS-rendered</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Diagrama de flujo de datos</h2>
+
+  <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin: 20px 0; font-size: 12px; color: #475569; line-height: 2;">
+    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="text-align: center;">
+        <div style="font-size: 28px;">📡</div>
+        <div style="font-weight: 600; color: var(--dark);">RSS Feeds</div>
+        <div>Fuentes internacionales</div>
+      </div>
+      <div style="font-size: 24px; color: #cbd5e1;">→</div>
+      <div style="text-align: center;">
+        <div style="font-size: 28px;">⚙️</div>
+        <div style="font-weight: 600; color: var(--dark);">GitHub Actions</div>
+        <div>Pipeline diario</div>
+      </div>
+      <div style="font-size: 24px; color: #cbd5e1;">→</div>
+      <div style="text-align: center;">
+        <div style="font-size: 28px;">🧠</div>
+        <div style="font-weight: 600; color: var(--dark);">Claude AI</div>
+        <div>Traducción + categorización</div>
+      </div>
+      <div style="font-size: 24px; color: #cbd5e1;">→</div>
+      <div style="text-align: center;">
+        <div style="font-size: 28px;">🗄️</div>
+        <div style="font-weight: 600; color: var(--dark);">Supabase</div>
+        <div>PostgreSQL storage</div>
+      </div>
+      <div style="font-size: 24px; color: #cbd5e1;">→</div>
+      <div style="text-align: center;">
+        <div style="font-size: 28px;">🌐</div>
+        <div style="font-weight: 600; color: var(--dark);">Vercel</div>
+        <div>CDN global</div>
+      </div>
+      <div style="font-size: 24px; color: #cbd5e1;">→</div>
+      <div style="text-align: center;">
+        <div style="font-size: 28px;">👤</div>
+        <div style="font-weight: 600; color: var(--dark);">Lector</div>
+        <div>web + Twitter</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 6: ROADMAP -->
+<div class="page">
+  <div class="section-label">Crecimiento y Escalabilidad</div>
+  <h1>Roadmap y oportunidades</h1>
+  <p class="lead">
+    El sistema está diseñado para escalar. Estas son las palancas de crecimiento
+    identificadas para aumentar tráfico, engagement y monetización.
+  </p>
+
+  <h2>Próximos pasos técnicos</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-icon blue">🗂️</div>
+      <h3>Páginas de categoría SEO</h3>
+      <p>URLs tipo /categoria/modelos-y-llms para capturar búsquedas específicas en Google. Alto impacto en tráfico orgánico.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">📧</div>
+      <h3>Newsletter semanal</h3>
+      <p>Digest automático con los 10 mejores artículos de la semana. Generado por IA y enviado vía Resend. Base de suscriptores propia.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon purple">🔍</div>
+      <h3>Búsqueda de artículos</h3>
+      <p>Full-text search sobre el archivo de noticias. Diferenciador clave frente a otros medios y fuerte señal de engagement para SEO.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon orange">💡</div>
+      <h3>Resúmenes semanales IA</h3>
+      <p>Artículos de síntesis generados por Claude que resumen los grandes temas de la semana en IA. Contenido original de alto valor.</p>
+    </div>
+  </div>
+
+  <h2>Modelo de monetización</h2>
+  <table class="stack-table">
+    <thead>
+      <tr>
+        <th>Canal</th>
+        <th>Mecanismo</th>
+        <th>Potencial</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Display Ads</td>
+        <td>Google AdSense o Carbon Ads (tech-focused)</td>
+        <td><span class="tag">Corto plazo</span></td>
+      </tr>
+      <tr>
+        <td>Newsletter patrocinada</td>
+        <td>Sponsors en el digest semanal</td>
+        <td><span class="tag green">Medio plazo</span></td>
+      </tr>
+      <tr>
+        <td>Contenido patrocinado</td>
+        <td>Artículos de empresas de IA en el feed</td>
+        <td><span class="tag green">Medio plazo</span></td>
+      </tr>
+      <tr>
+        <td>API del contenido</td>
+        <td>Licenciar el feed de noticias en español a otras plataformas</td>
+        <td><span class="tag purple">Largo plazo</span></td>
+      </tr>
+      <tr>
+        <td>Premium / membresía</td>
+        <td>Acceso a newsletter premium, resúmenes profundos, alertas</td>
+        <td><span class="tag purple">Largo plazo</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight">
+    <h3>Ventaja competitiva sostenible</h3>
+    <p>
+      La combinación de <strong>automatización total</strong> + <strong>contenido en español de calidad</strong> +
+      <strong>SEO técnico sólido</strong> crea una barrera de entrada alta. A medida que el archivo de artículos
+      crece, el activo de contenido indexado en Google se vuelve cada vez más valioso y difícil de replicar.
+    </p>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+</body>
+</html>
