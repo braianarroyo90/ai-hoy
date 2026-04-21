@@ -101,60 +101,68 @@ export default async function RadarPage() {
 
         <hr className="border-zinc-800 my-10" />
 
-        {/* Ganadores y Perdedores */}
-        <section className="grid sm:grid-cols-2 gap-6 mb-10">
-          <div>
-            <div className="text-xs font-bold tracking-widest uppercase text-green-400 mb-4">Ganadores</div>
-            <div className="space-y-5">
+        {/* Tablero de la semana */}
+        <section className="mb-10">
+          <div className="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-1">El tablero de la semana</div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-8" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+            Quién subió y quién bajó
+          </h2>
+
+          {/* Ganadores */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-green-400 text-lg">↑</span>
+              <span className="text-xs font-bold tracking-widest uppercase text-green-400">Los que ganaron</span>
+            </div>
+            <div className="space-y-5 pl-4 border-l border-green-900/50">
               {c.ganadores.map((g, i) => (
-                <div key={i} className="flex gap-3">
-                  <span className="text-green-400 mt-0.5 shrink-0">↑</span>
-                  <div>
-                    <p className="font-semibold text-white text-sm">{g.nombre}</p>
-                    <p className="text-zinc-400 text-sm leading-snug mb-2">{g.razon}</p>
-                    {g.articulos && g.articulos.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {g.articulos.map((a: RadarArticleRef) => (
-                          <Link
-                            key={a.slug}
-                            href={`/articulo/${a.slug}`}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-950/60 border border-green-800/50 text-green-400 text-xs hover:bg-green-900/60 transition-colors"
-                          >
-                            <span className="opacity-60">↗</span>
-                            <span className="truncate max-w-[180px]">{a.titulo}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                <div key={i}>
+                  <p className="font-semibold text-white text-sm">{g.nombre}</p>
+                  <p className="text-zinc-400 text-sm leading-snug mt-0.5 mb-2">{g.razon}</p>
+                  {g.articulos && g.articulos.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {g.articulos.map((a: RadarArticleRef) => (
+                        <Link
+                          key={a.slug}
+                          href={`/articulo/${a.slug}`}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-950/60 border border-green-800/50 text-green-400 text-xs hover:bg-green-900/60 transition-colors"
+                        >
+                          <span className="opacity-60">↗</span>
+                          <span className="truncate max-w-[200px]">{a.titulo}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
+
+          {/* Perdedores */}
           <div>
-            <div className="text-xs font-bold tracking-widest uppercase text-red-400 mb-4">Perdedores</div>
-            <div className="space-y-5">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-red-400 text-lg">↓</span>
+              <span className="text-xs font-bold tracking-widest uppercase text-red-400">Los que perdieron</span>
+            </div>
+            <div className="space-y-5 pl-4 border-l border-red-900/50">
               {c.perdedores.map((p, i) => (
-                <div key={i} className="flex gap-3">
-                  <span className="text-red-400 mt-0.5 shrink-0">↓</span>
-                  <div>
-                    <p className="font-semibold text-white text-sm">{p.nombre}</p>
-                    <p className="text-zinc-400 text-sm leading-snug mb-2">{p.razon}</p>
-                    {p.articulos && p.articulos.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {p.articulos.map((a: RadarArticleRef) => (
-                          <Link
-                            key={a.slug}
-                            href={`/articulo/${a.slug}`}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/50 text-red-400 text-xs hover:bg-red-900/60 transition-colors"
-                          >
-                            <span className="opacity-60">↗</span>
-                            <span className="truncate max-w-[180px]">{a.titulo}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                <div key={i}>
+                  <p className="font-semibold text-white text-sm">{p.nombre}</p>
+                  <p className="text-zinc-400 text-sm leading-snug mt-0.5 mb-2">{p.razon}</p>
+                  {p.articulos && p.articulos.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {p.articulos.map((a: RadarArticleRef) => (
+                        <Link
+                          key={a.slug}
+                          href={`/articulo/${a.slug}`}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/50 text-red-400 text-xs hover:bg-red-900/60 transition-colors"
+                        >
+                          <span className="opacity-60">↗</span>
+                          <span className="truncate max-w-[200px]">{a.titulo}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
