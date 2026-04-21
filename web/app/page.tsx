@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabase, Article, RadarReport } from "@/lib/supabase";
+import { siteConfig } from "@/lib/site-config";
 import ArticleCard from "@/components/ArticleCard";
 import CategoryNav from "@/components/CategoryNav";
 import HeroEditorial from "@/components/HeroEditorial";
@@ -10,17 +11,6 @@ import RadarCard from "@/components/RadarCard";
 export const revalidate = 3600;
 
 const PAGE_SIZE = 30;
-
-const CATEGORIES = [
-  "Modelos y LLMs",
-  "Herramientas y Productos",
-  "Investigación",
-  "Empresas y Negocios",
-  "Política y Ética",
-  "Robótica",
-  "Agentes de IA",
-  "Diseño e IA",
-];
 
 async function getArticles(category?: string, page = 1): Promise<{ articles: Article[]; total: number }> {
   const from = (page - 1) * PAGE_SIZE;
@@ -113,13 +103,13 @@ export default async function Home({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "AI Hoy",
-    url: "https://ai-hoy.vercel.app",
-    description: "Las mejores noticias de inteligencia artificial en español",
-    inLanguage: "es",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.tagline,
+    inLanguage: siteConfig.lang,
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://ai-hoy.vercel.app/?category={search_term_string}",
+      target: `${siteConfig.url}/?category={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };
@@ -135,10 +125,11 @@ export default async function Home({
           <div className="max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 border-b border-zinc-800/60">
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                <span className="text-blue-400">AI</span> Hoy
+                <span className="text-blue-400">{siteConfig.name.split(" ")[0]}</span>{" "}
+                {siteConfig.name.split(" ").slice(1).join(" ")}
               </h1>
               <p className="text-zinc-400 text-xs sm:text-sm mt-0.5 hidden sm:block">
-                Noticias de inteligencia artificial en español
+                {siteConfig.tagline}
               </p>
             </div>
             <Link
@@ -152,7 +143,7 @@ export default async function Home({
           <NewsTicker articles={articles.slice(0, 12).map(a => ({ slug: a.slug ?? null, source_url: a.source_url, es_title: a.es_title }))} />
         </header>
 
-        <CategoryNav active={category} categories={CATEGORIES} counts={counts} />
+        <CategoryNav active={category} categories={siteConfig.categories} counts={counts} />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {!category && page === 1 && radar && (

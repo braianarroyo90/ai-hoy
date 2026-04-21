@@ -28,6 +28,9 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import edge_tts
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from core.config_loader import get_config, feature_enabled
+
 # ── Configuración ────────────────────────────────────────────────────
 SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
@@ -40,7 +43,6 @@ FONT_FILE     = AGENTS_DIR / "Roboto-Bold.ttf"
 
 VIDEOS_PER_RUN = 2
 W, H           = 1080, 1920
-VOICE          = "es-AR-TomasNeural"
 YT_SCOPES      = ["https://www.googleapis.com/auth/youtube.upload"]
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
@@ -171,12 +173,12 @@ def generate_script(article: dict) -> dict:
     return json.loads(raw)
 
 # ── TTS con Edge TTS ─────────────────────────────────────────────────
-async def _tts_async(text: str, path: str):
-    comm = edge_tts.Communicate(text, VOICE, rate="+10%")
+async def _tts_async(text: str, path: str, voice: str):
+    comm = edge_tts.Communicate(text, voice, rate="+10%")
     await comm.save(path)
 
-def generate_tts(text: str, path: str):
-    asyncio.run(_tts_async(text, path))
+def generate_tts(text: str, path: str, voice: str):
+    asyncio.run(_tts_async(text, path, voice))
 
 def get_audio_duration(path: str) -> float:
     result = subprocess.run(
@@ -408,7 +410,7 @@ def create_bg_frame(scene_bg_path: Optional[str], article_bg_path: Optional[str]
     return out
 
 
-def create_text_overlay(scene: dict, category: str, workdir: Path, idx: int, total: int = 5) -> Path:
+def create_text_overlay(scene: dict, category: str, workdir: Path, idx: int, total: int = 5, handle: str = "@AIHoyES") -> Path:
     """Capa de texto: RGBA transparente, queda estática mientras el fondo se mueve."""
     color = CATEGORY_COLORS.get(category, DEFAULT_COLOR)
     cr, cg, cb = color
@@ -471,7 +473,6 @@ def create_text_overlay(scene: dict, category: str, workdir: Path, idx: int, tot
 
     # Handle sutil
     handle_font = get_font(30)
-    handle = "@AIHoyES"
     hb = draw.textbbox((0, 0), handle, font=handle_font)
     draw.text(((W - (hb[2] - hb[0])) // 2, H - 72), handle,
               font=handle_font, fill=(255, 255, 255, 90))
@@ -633,7 +634,7 @@ def upload_to_youtube(yt, video_path: Path, script: dict) -> str:
     return f"https://www.youtube.com/shorts/{video_id}"
 
 # ── Pipeline por artículo ────────────────────────────────────────────
-def process_article(article: dict, yt) -> str:
+def process_article(article: dict, yt, voice: str, handle: str) -> str:
     print(f"\n[VIDEO] {article['es_title'][:70]}...")
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -669,10 +670,10 @@ def process_article(article: dict, yt) -> str:
 
             scene_img = scene_imgs[i]
             bg_frame  = create_bg_frame(scene_img, bg_path, article["category"], workdir, i)
-            txt_frame = create_text_overlay(scene, article["category"], workdir, i)
+            txt_frame = create_text_overlay(scene, article["category"], workdir, i, handle=handle)
 
             audio_path = workdir / f"audio_{i:02d}.mp3"
-            generate_tts(scene["narracion"], str(audio_path))
+            generate_tts(scene["narracion"], str(audio_path), voice)
             duration = get_audio_duration(str(audio_path))
 
             scene_video = workdir / f"scene_{i:02d}.mp4"
@@ -700,19 +701,27 @@ def process_article(article: dict, yt) -> str:
 
 # ── Entry point ──────────────────────────────────────────────────────
 def main():
+    if not feature_enabled("video_shorts"):
+        print("Feature 'video_shorts' desactivada para este sitio.")
+        return
+
+    config = get_config()
+    voice  = config.get("tts_voice", "es-AR-TomasNeural")
+    handle = config["youtube"]["channel"]
+
     ensure_font()
 
     articles = get_articles()
     if not articles:
-        print("No hay artículos nuevos para generar videos.")
+        print(f"[{config['name']}] No hay artículos nuevos para generar videos.")
         return
 
-    print(f"Generando {len(articles)} video(s)...")
+    print(f"[{config['name']}] Generando {len(articles)} video(s)...")
     yt = get_youtube_service()
 
     for article in articles:
         try:
-            process_article(article, yt)
+            process_article(article, yt, voice, handle)
         except Exception as e:
             print(f"  ERROR en '{article['es_title'][:40]}': {e}")
             import traceback

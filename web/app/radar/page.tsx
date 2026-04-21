@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { supabase, RadarReport } from "@/lib/supabase";
+import { siteConfig } from "@/lib/site-config";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "El Radar — Inteligencia semanal de IA",
-  description: "El análisis editorial semanal de AI Hoy: ganadores, perdedores, tendencias emergentes y lo que viene en inteligencia artificial.",
+  title: "El Radar — Inteligencia editorial semanal",
+  description: `El análisis editorial semanal de ${siteConfig.name}: ganadores, perdedores, tendencias emergentes y lo que viene.`,
 };
 
 async function getLatestRadar(): Promise<RadarReport | null> {
@@ -43,7 +44,8 @@ export default async function RadarPage() {
         <header className="border-b border-zinc-800/60 px-4 sm:px-6 py-3 backdrop-blur-md bg-zinc-950/85">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
             <Link href="/" className="text-xl font-bold tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-              <span className="text-blue-400">AI</span> Hoy
+              <span className="text-blue-400">{siteConfig.name.split(" ")[0]}</span>{" "}
+              {siteConfig.name.split(" ").slice(1).join(" ")}
             </Link>
             <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors">← Volver</Link>
           </div>

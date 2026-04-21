@@ -1,10 +1,9 @@
 import { MetadataRoute } from "next";
-
-const BASE_URL = "https://ai-hoy.vercel.app";
+import { siteConfig } from "@/lib/site-config";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: `${siteConfig.url}/sitemap.xml`,
   };
 }

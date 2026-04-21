@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { siteConfig } from "@/lib/site-config";
 import RelatedArticles from "@/components/RelatedArticles";
 import type { Metadata } from "next";
 
@@ -60,11 +61,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     description: article.es_summary,
     datePublished: article.published_at,
     image: article.og_image ?? undefined,
-    inLanguage: "es",
+    inLanguage: siteConfig.lang,
     publisher: {
       "@type": "Organization",
-      name: "AI Hoy",
-      url: "https://ai-hoy.vercel.app",
+      name: siteConfig.name,
+      url: siteConfig.url,
     },
   };
 
@@ -83,7 +84,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <header className="sticky top-0 z-50 border-b border-zinc-800/60 px-4 sm:px-6 py-3 backdrop-blur-md bg-zinc-950/85">
           <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
             <Link href="/" className="text-xl font-bold tracking-tight hover:text-zinc-300 transition-colors shrink-0" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-              <span className="text-blue-400">AI</span> Hoy
+              <span className="text-blue-400">{siteConfig.name.split(" ")[0]}</span>{" "}
+              {siteConfig.name.split(" ").slice(1).join(" ")}
             </Link>
             <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors truncate">
               ← Volver
