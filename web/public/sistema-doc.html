@@ -1157,6 +1157,120 @@
   </div>
 </div>
 
+<!-- PAGE: MULTI-SITE -->
+<div class="page">
+  <div class="section-label">Arquitectura Multi-Sitio</div>
+  <h1>Un codebase, múltiples sitios</h1>
+  <p class="lead">
+    El sistema está completamente parametrizado. Con un único repositorio se pueden operar
+    tantos sitios temáticos como se quiera — cada uno con su propio contenido, voz editorial,
+    categorías y canal de distribución, sin duplicar código.
+  </p>
+
+  <h2>Cómo funciona</h2>
+  <div class="highlight" style="margin-bottom: 24px;">
+    <p>
+      Cada sitio tiene un archivo <code>sites/{site_id}/config.json</code> con toda su configuración.
+      Los agentes leen ese archivo en runtime según la variable de entorno <code>SITE_ID</code>.
+      El frontend lee variables <code>NEXT_PUBLIC_SITE_*</code> en Vercel.
+    </p>
+  </div>
+
+  <div class="grid-2" style="margin-bottom: 28px;">
+    <div class="card">
+      <div class="card-icon blue">⚙️</div>
+      <h3>Agentes (Python)</h3>
+      <p>Todos los agentes leen <code>core/config_loader.py</code> que carga el <code>config.json</code> según <code>SITE_ID</code>. Cada agente tiene un feature flag: si está desactivado para ese sitio, no corre.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon purple">🌐</div>
+      <h3>Frontend (Next.js)</h3>
+      <p>El sitio web lee variables de entorno <code>NEXT_PUBLIC_SITE_*</code> en Vercel. Nombre, tagline, URL, categorías y locale son completamente configurables sin tocar código.</p>
+    </div>
+  </div>
+
+  <h2>Estructura del config.json</h2>
+  <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 20px; font-family: monospace; font-size: 12px; line-height: 1.8; margin-bottom: 24px; overflow-x: auto;">
+<pre style="margin:0; white-space: pre-wrap;">{
+  "site_id": "futbol-hoy",
+  "name": "Fútbol Hoy",
+  "tagline": "Las últimas noticias del fútbol mundial",
+  "topic": "fútbol, deportes, transferencias",
+  "language": "es",
+  "locale": "es_AR",
+  "tts_voice": "es-AR-TomasNeural",
+  "accent_color": "#22c55e",
+  "url": "https://futbol-hoy.vercel.app",
+  "categories": ["Liga Argentina", "Champions League", "Transferencias", ...],
+  "rss_sources": ["https://tycsports.com/rss", ...],
+  "features": {
+    "crawler": true,
+    "redactor": true,
+    "twitter_poster": false,
+    "video_shorts": false,
+    "radar": true
+  },
+  "prompts": {
+    "editorial_voice": "Sos un periodista deportivo...",
+    "radar_voice": "Sos el editor de un medio deportivo..."
+  },
+  "twitter": { "hashtags": { "Liga Argentina": "#Futbol #LigaArg" } },
+  "youtube": { "channel": "@FutbolHoyAR", "search_queries": [...] }
+}</pre>
+  </div>
+
+  <h2>Crear un nuevo sitio — paso a paso</h2>
+  <table class="stack-table">
+    <thead><tr><th>#</th><th>Paso</th><th>Quién</th><th>Dónde</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Crear <code>sites/{site_id}/config.json</code> con la configuración del nuevo sitio</td>
+        <td>Dev</td>
+        <td>Repositorio Git</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Crear un nuevo proyecto en Vercel apuntando al mismo repositorio</td>
+        <td>Admin</td>
+        <td>vercel.com</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Agregar variables de entorno en Vercel: <code>NEXT_PUBLIC_SITE_NAME</code>, <code>NEXT_PUBLIC_SITE_URL</code>, <code>NEXT_PUBLIC_SITE_TAGLINE</code>, <code>NEXT_PUBLIC_SITE_CATEGORIES</code>, <code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td>
+        <td>Admin</td>
+        <td>Vercel → Settings → Env Vars</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Agregar secrets en GitHub Actions: <code>SITE_ID</code>, <code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_KEY</code>, <code>ANTHROPIC_API_KEY</code></td>
+        <td>Admin</td>
+        <td>GitHub → Settings → Secrets</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Correr el pipeline manualmente para poblar el nuevo sitio con contenido inicial</td>
+        <td>Admin</td>
+        <td>GitHub Actions → Run workflow</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight" style="margin-top: 24px;">
+    <h3>Features independientes por sitio</h3>
+    <p>
+      Cada sitio activa o desactiva cada agente de forma independiente con un flag en <code>config.json</code>.
+      Por ejemplo, un sitio puede tener el radar semanal activo pero sin generación de videos —
+      el agente detecta el flag y termina sin hacer nada, sin afectar el resto del pipeline.
+    </p>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
 <!-- PAGE 6: ROADMAP -->
 <div class="page">
   <div class="section-label">Crecimiento y Escalabilidad</div>
@@ -1187,6 +1301,11 @@
       <div class="card-icon" style="background:#dcfce7;">🧩</div>
       <h3>Frontend responsive <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
       <p>Grilla de 2 columnas en mobile, ShortsSection mid-feed, RadarCard destacada en home, header compacto. Diseño optimizado para todos los dispositivos.</p>
+    </div>
+    <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+      <div class="card-icon" style="background:#dcfce7;">🌐</div>
+      <h3>Arquitectura multi-sitio <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
+      <p>Un único codebase puede operar múltiples sitios temáticos. Cada sitio tiene su <code>config.json</code> con voz editorial, categorías, RSS, features activos y canal de distribución. Nuevo sitio en minutos.</p>
     </div>
   </div>
 
