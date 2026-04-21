@@ -135,7 +135,7 @@ def get_recent_articles() -> list[dict]:
         .eq("status", "published")
         .is_("tweeted_at", "null")
         .gte("published_at", cutoff)
-        .order("published_at", ascending=False)
+        .order("published_at", desc=True)
         .limit(MAX_TWEETS)
         .execute()
     )
