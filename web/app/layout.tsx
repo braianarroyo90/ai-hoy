@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, DM_Sans, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import PosthogProvider from "@/components/PosthogProvider";
+import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -21,31 +22,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const BASE_URL = "https://ai-hoy.vercel.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "AI Hoy — Noticias de Inteligencia Artificial en Español",
-    template: "%s | AI Hoy",
+    default: `${siteConfig.name} — ${siteConfig.tagline}`,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: "Las mejores noticias de inteligencia artificial, curadas y resumidas en español. Actualizado cada 6 horas.",
-  keywords: ["inteligencia artificial", "noticias IA", "machine learning", "LLM", "AI en español", "tecnología"],
+  description: `${siteConfig.tagline}. Actualizado cada 6 horas.`,
   openGraph: {
     type: "website",
-    locale: "es_AR",
-    url: BASE_URL,
-    siteName: "AI Hoy",
-    title: "AI Hoy — Noticias de IA en Español",
-    description: "Las mejores noticias de inteligencia artificial, curadas y resumidas en español.",
+    locale: siteConfig.locale,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    description: siteConfig.tagline,
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Hoy — Noticias de IA en Español",
-    description: "Las mejores noticias de inteligencia artificial, curadas y resumidas en español.",
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    description: siteConfig.tagline,
   },
   alternates: {
-    canonical: BASE_URL,
+    canonical: siteConfig.url,
   },
 };
 
@@ -56,7 +54,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="es"
+      lang={siteConfig.lang}
       className={`${spaceGrotesk.variable} ${dmSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
