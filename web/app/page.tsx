@@ -80,7 +80,11 @@ export default async function Home({
       .order("published_at", { ascending: false })
       .limit(20),
   ]);
-  const shorts = (shortsData.data ?? []) as { id: string; title: string; channel: string; thumbnail: string; published_at: string }[];
+  const MOCK_SHORTS = [
+    { id: "dQw4w9WgXcQ", title: "Video de prueba — los reales cargan desde Supabase", channel: "AI Hoy", thumbnail: "", published_at: new Date().toISOString() },
+  ];
+  const shorts = ((shortsData.data ?? []) as { id: string; title: string; channel: string; thumbnail: string; published_at: string }[]);
+  const shortsToShow = shorts.length > 0 ? shorts : MOCK_SHORTS;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   // Hero must have an image — pick the first article that does
@@ -153,7 +157,7 @@ export default async function Home({
               </div>
 
               {!category && page === 1 && (
-                <ShortsSection shorts={shorts} />
+                <ShortsSection shorts={shortsToShow} />
               )}
 
               {totalPages > 1 && (
