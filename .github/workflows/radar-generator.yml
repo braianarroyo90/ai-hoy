@@ -1,0 +1,29 @@
+name: Radar Semanal
+
+on:
+  schedule:
+    - cron: "0 8 * * 0"   # Domingos a las 8:00 UTC (5am Argentina)
+  workflow_dispatch:
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: agents/requirements.txt
+
+      - run: pip install -r agents/requirements.txt
+
+      - name: Generate Radar
+        env:
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python agents/radar_generator.py

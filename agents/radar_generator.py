@@ -1,0 +1,142 @@
+"""
+radar_generator.py — Genera El Radar semanal de AI Hoy.
+Lee los artículos de la última semana desde Supabase,
+pide a Claude un reporte de inteligencia editorial y lo guarda.
+"""
+
+import os
+import sys
+import json
+from datetime import datetime, timezone, timedelta
+from supabase import create_client
+import anthropic
+
+SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
+ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
+SYSTEM_PROMPT = """Sos el editor jefe de AI Hoy, el medio de noticias de inteligencia artificial en español.
+Cada domingo generás "El Radar" — un reporte de inteligencia semanal con voz editorial propia.
+Tu tono es analítico, directo y perspicaz. No repetís noticias, las interpretás.
+Respondés ÚNICAMENTE con un JSON válido, sin texto adicional."""
+
+RADAR_PROMPT = """Analizá los siguientes artículos de la semana en IA y generá El Radar semanal.
+
+ARTÍCULOS DE LA SEMANA:
+{articles_text}
+
+Generá un JSON con esta estructura exacta:
+{{
+  "titulo": "El Radar — [rango de fechas, ej: 14 al 20 de abril]",
+  "historia_semana": {{
+    "titulo": "título impactante de la historia principal",
+    "texto": "3 párrafos de análisis profundo sobre el desarrollo más importante. No resumas, interpretá. ¿Por qué importa? ¿Qué cambia?"
+  }},
+  "ganadores": [
+    {{"nombre": "empresa o persona", "razon": "1 oración contundente explicando por qué ganó esta semana"}},
+    {{"nombre": "...", "razon": "..."}},
+    {{"nombre": "...", "razon": "..."}}
+  ],
+  "perdedores": [
+    {{"nombre": "empresa o persona", "razon": "1 oración contundente explicando por qué perdió esta semana"}},
+    {{"nombre": "...", "razon": "..."}}
+  ],
+  "tendencia": {{
+    "titulo": "nombre de la tendencia emergente",
+    "texto": "2 párrafos sobre un patrón que empezó a aparecer esta semana y que hay que seguir de cerca"
+  }},
+  "lo_que_viene": "2-3 oraciones sobre qué esperar la próxima semana. Concreto, no vago.",
+  "pregunta_semana": "Una pregunta provocadora sobre el futuro de la IA que surge de las noticias de esta semana. Que invite a pensar."
+}}"""
+
+
+def get_week_articles(db) -> list[dict]:
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    result = db.table("articles") \
+        .select("es_title, es_summary, category, published_at, source_name") \
+        .eq("status", "published") \
+        .gte("published_at", week_ago) \
+        .order("published_at", ascending=False) \
+        .limit(40) \
+        .execute()
+    return result.data or []
+
+
+def format_articles(articles: list[dict]) -> str:
+    lines = []
+    for a in articles:
+        date = a["published_at"][:10]
+        lines.append(f"[{date}] [{a['category']}] {a['es_title']}\n{a['es_summary']}\n")
+    return "\n".join(lines)
+
+
+def generate_radar(articles: list[dict]) -> dict:
+    client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
+    articles_text = format_articles(articles)
+
+    response = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=4000,
+        system=SYSTEM_PROMPT,
+        messages=[{
+            "role": "user",
+            "content": RADAR_PROMPT.format(articles_text=articles_text)
+        }]
+    )
+
+    raw = response.content[0].text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    return json.loads(raw.strip())
+
+
+def already_published_this_week(db) -> bool:
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    result = db.table("radar_reports") \
+        .select("id") \
+        .gte("published_at", week_ago) \
+        .limit(1) \
+        .execute()
+    return len(result.data or []) > 0
+
+
+def main():
+    if not all([SUPABASE_URL, SUPABASE_KEY, ANTHROPIC_KEY]):
+        print("ERROR: Faltan variables de entorno")
+        sys.exit(1)
+
+    db = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+    if already_published_this_week(db):
+        print("Ya existe un Radar esta semana. Saliendo.")
+        return
+
+    print("Leyendo artículos de la semana...")
+    articles = get_week_articles(db)
+    if len(articles) < 5:
+        print(f"Solo {len(articles)} artículos esta semana — no es suficiente para el Radar.")
+        return
+    print(f"  {len(articles)} artículos encontrados")
+
+    now = datetime.now(timezone.utc)
+    week_start = (now - timedelta(days=7)).date()
+    week_end = now.date()
+
+    print("Generando El Radar con Claude...")
+    content = generate_radar(articles)
+    print(f"  Título: {content['titulo']}")
+
+    row = {
+        "week_start": str(week_start),
+        "week_end":   str(week_end),
+        "title":      content["titulo"],
+        "content":    content,
+    }
+    db.table("radar_reports").insert(row).execute()
+    print(f"\n✅ Radar publicado: {content['titulo']}")
+
+
+if __name__ == "__main__":
+    main()
