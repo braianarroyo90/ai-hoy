@@ -76,10 +76,12 @@ export default async function Home({
   ]);
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // Split: hero takes first 5, grid gets the rest
-  const heroArticle   = articles[0];
-  const headlineList  = articles.slice(1, 5);
-  const gridArticles  = articles.slice(5);
+  // Hero must have an image — pick the first article that does
+  const heroIndex     = articles.findIndex((a) => !!a.og_image);
+  const heroArticle   = heroIndex !== -1 ? articles[heroIndex] : null;
+  const rest          = heroArticle ? articles.filter((_, i) => i !== heroIndex) : articles;
+  const headlineList  = rest.slice(0, 4);
+  const gridArticles  = rest.slice(4);
   const showHero      = !category && page === 1 && !!heroArticle;
 
   function pageUrl(p: number) {
