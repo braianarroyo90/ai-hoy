@@ -14,11 +14,16 @@ function ShortCard({ s }: { s: Short }) {
   const [active, setActive] = useState(false);
 
   return (
-    <div className="flex-none w-44 snap-start group cursor-pointer" onClick={() => setActive(!active)}>
+    <div
+      className="flex-none w-44 snap-start group cursor-pointer"
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      onClick={() => setActive(!active)}
+    >
       <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-zinc-800 border border-zinc-700/50 group-hover:border-zinc-500 transition-all duration-200 group-hover:scale-[1.02]">
         {active ? (
           <iframe
-            src={`https://www.youtube.com/embed/${s.id}?autoplay=1`}
+            src={`https://www.youtube.com/embed/${s.id}?autoplay=1&mute=1`}
             className="w-full h-full"
             allow="autoplay; encrypted-media"
             allowFullScreen

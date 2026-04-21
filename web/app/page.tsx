@@ -150,33 +150,18 @@ export default async function Home({
                 <HeroEditorial hero={heroArticle} headlines={headlineList} />
               )}
 
-              {(() => {
-                const displayArticles = showHero ? gridArticles : articles;
-                const SPLIT = 6;
-                const firstBatch  = displayArticles.slice(0, SPLIT);
-                const secondBatch = displayArticles.slice(SPLIT);
-                return (
+              <div className="mt-2 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {(showHero ? gridArticles : articles).map((a, i) => (
                   <>
-                    <div className="mt-2 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                      {firstBatch.map((a, i) => (
-                        <ArticleCard key={a.id} article={a} size={getCardSize(i)} />
-                      ))}
-                    </div>
-
-                    {!category && page === 1 && (
-                      <ShortsSection shorts={shortsToShow} />
-                    )}
-
-                    {secondBatch.length > 0 && (
-                      <div className="mt-2 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                        {secondBatch.map((a, i) => (
-                          <ArticleCard key={a.id} article={a} size={getCardSize(i + SPLIT)} />
-                        ))}
+                    {!category && page === 1 && i === 6 && (
+                      <div key="shorts" className="col-span-full">
+                        <ShortsSection shorts={shortsToShow} />
                       </div>
                     )}
+                    <ArticleCard key={a.id} article={a} size={getCardSize(i)} />
                   </>
-                );
-              })()}
+                ))}
+              </div>
 
               {totalPages > 1 && (
                 <div className="mt-10 flex items-center justify-center gap-3">
