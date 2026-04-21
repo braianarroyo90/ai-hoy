@@ -479,7 +479,7 @@
         <div class="label">Automatizado</div>
       </div>
       <div class="cover-stat">
-        <div class="number">8</div>
+        <div class="number">9</div>
         <div class="label">Agentes activos</div>
       </div>
       <div class="cover-stat">
@@ -534,7 +534,7 @@
     <div class="card">
       <div class="card-icon blue">🌐</div>
       <h3>Sitio web</h3>
-      <p>ai-hoy.vercel.app — artículos completos en español con SEO, categorías, artículos relacionados y sección de Shorts embebidos. Actualizado diariamente.</p>
+      <p>ai-hoy.vercel.app — artículos, El Radar semanal, Shorts embebidos y sección de tendencias. Actualizado diariamente.</p>
     </div>
     <div class="card">
       <div class="card-icon" style="background:#e0f2fe;">🐦</div>
@@ -543,8 +543,8 @@
     </div>
     <div class="card">
       <div class="card-icon" style="background:#fef2f2;">▶️</div>
-      <h3>YouTube Shorts</h3>
-      <p>2 Shorts diarios generados con IA: guión con Claude, voz con Edge TTS, imágenes con Pollinations AI y montaje con FFmpeg. En producción.</p>
+      <h3>YouTube</h3>
+      <p>2 Shorts diarios generados con IA. En desarrollo: AI Hoy Live — noticiero diario con presentador virtual generado por IA.</p>
     </div>
   </div>
 
@@ -840,6 +840,30 @@
       </div>
     </div>
     <p>Busca Shorts recientes de IA en YouTube usando la <strong>Data API v3</strong> con queries en español (inteligencia artificial, AI news, OpenAI novedades, etc.). Guarda los videos en la tabla <code>youtube_shorts</code> de Supabase y limpia automáticamente los de más de 30 días. El frontend los muestra como shelf horizontal mid-feed en la home, con reproducción en modal con dimmer.</p>
+  </div>
+
+  <div class="agent-card">
+    <div class="cron">0 8 * * 0</div>
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#eff6ff;">🔭</div>
+      <div>
+        <h3>Radar Generator <span class="tag green" style="font-size:10px;vertical-align:middle;margin-left:6px;">En producción</span></h3>
+        <div class="trigger">Domingos a las 8:00 UTC — semanal</div>
+      </div>
+    </div>
+    <p>Cada domingo lee los últimos 40 artículos publicados en Supabase y pide a <strong>Claude Sonnet</strong> que genere "El Radar" — un reporte de inteligencia editorial semanal. El reporte incluye: la historia de la semana con análisis profundo, ganadores y perdedores, tendencia emergente, lo que viene y la pregunta de la semana. Se guarda en la tabla <code>radar_reports</code> y se publica en <code>/radar</code> con diseño editorial destacado y card prominente en la home.</p>
+  </div>
+
+  <div class="agent-card" style="border: 1px dashed #fcd34d; background: linear-gradient(135deg,#fffbeb,#fff);">
+    <div class="cron" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">WIP — diario</div>
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#fef3c7;">📺</div>
+      <div>
+        <h3>AI Hoy Live <span class="tag orange" style="font-size:10px;vertical-align:middle;margin-left:6px;">En desarrollo</span></h3>
+        <div class="trigger">Noticiero diario con presentador virtual</div>
+      </div>
+    </div>
+    <p>El siguiente salto multimedia: un noticiero de 3-5 minutos generado automáticamente cada mañana. <strong>Claude</strong> escribe el guión con las 5 noticias del día, <strong>ElevenLabs</strong> narra con voz natural, <strong>D-ID o HeyGen</strong> genera un presentador virtual con lip sync realista, <strong>FFmpeg</strong> monta el video con gráficas de noticias. Se sube a YouTube como video principal — no como Short. El primer noticiero de IA en español generado íntegramente por inteligencia artificial.</p>
   </div>
 
   <div class="footer">
@@ -1154,14 +1178,24 @@
       <h3>YouTube Shorts Curator <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
       <p>Busca Shorts de IA de la comunidad 2 veces/día y los muestra embebidos en la home como shelf mid-feed. Reproducción con modal y dimmer.</p>
     </div>
+    <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+      <div class="card-icon" style="background:#dcfce7;">🔭</div>
+      <h3>El Radar Semanal <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
+      <p>Reporte de inteligencia editorial generado cada domingo por Claude. Historia de la semana, ganadores, perdedores, tendencias y predicciones. Publicado en /radar con card destacada en la home.</p>
+    </div>
+    <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+      <div class="card-icon" style="background:#dcfce7;">🧩</div>
+      <h3>Frontend responsive <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
+      <p>Grilla de 2 columnas en mobile, ShortsSection mid-feed, RadarCard destacada en home, header compacto. Diseño optimizado para todos los dispositivos.</p>
+    </div>
   </div>
 
   <h2>En desarrollo ahora</h2>
   <div class="grid-2">
-    <div class="card">
-      <div class="card-icon blue">🗂️</div>
-      <h3>Páginas de categoría SEO</h3>
-      <p>URLs tipo /categoria/modelos-y-llms para capturar búsquedas específicas en Google. Alto impacto en tráfico orgánico.</p>
+    <div class="card" style="border: 1px dashed #fcd34d; background: #fffbeb;">
+      <div class="card-icon orange">📺</div>
+      <h3>AI Hoy Live <span class="tag orange" style="font-size:10px;vertical-align:middle;">WIP</span></h3>
+      <p>Noticiero diario de 3-5 minutos con presentador virtual generado por IA (D-ID/HeyGen). El primer noticiero de IA en español completamente automatizado.</p>
     </div>
     <div class="card">
       <div class="card-icon purple">📱</div>
