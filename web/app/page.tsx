@@ -124,12 +124,12 @@ export default async function Home({
       />
       <main className="min-h-screen bg-zinc-950 text-white">
         <header className="sticky top-0 z-50 backdrop-blur-md bg-zinc-950/85">
-          <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-4 border-b border-zinc-800/60">
+          <div className="max-w-5xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 border-b border-zinc-800/60">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                 <span className="text-blue-400">AI</span> Hoy
               </h1>
-              <p className="text-zinc-400 text-sm mt-0.5">
+              <p className="text-zinc-400 text-xs sm:text-sm mt-0.5 hidden sm:block">
                 Noticias de inteligencia artificial en español
               </p>
             </div>
@@ -139,7 +139,7 @@ export default async function Home({
 
         <CategoryNav active={category} categories={CATEGORIES} counts={counts} />
 
-        <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {articles.length === 0 ? (
             <p className="text-zinc-500 text-center mt-20">
               No hay artículos todavía. El pipeline corre cada 6 horas.

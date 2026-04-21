@@ -80,18 +80,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <main className="min-h-screen bg-zinc-950 text-white">
-        <header className="sticky top-0 z-50 border-b border-zinc-800/60 px-6 py-4 backdrop-blur-md bg-zinc-950/85">
-          <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold tracking-tight hover:text-zinc-300 transition-colors" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+        <header className="sticky top-0 z-50 border-b border-zinc-800/60 px-4 sm:px-6 py-3 backdrop-blur-md bg-zinc-950/85">
+          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+            <Link href="/" className="text-xl font-bold tracking-tight hover:text-zinc-300 transition-colors shrink-0" style={{ fontFamily: "var(--font-space-grotesk)" }}>
               <span className="text-blue-400">AI</span> Hoy
             </Link>
-            <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              ← Volver al inicio
+            <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors truncate">
+              ← Volver
             </Link>
           </div>
         </header>
 
-        <article className="max-w-3xl mx-auto px-6 py-10">
+        <article className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           {article.category && (
             <Link
               href={`/?category=${encodeURIComponent(article.category)}`}

@@ -121,7 +121,7 @@ export default function ShortsSection({ shorts }: { shorts: Short[] }) {
           </div>
           </div>
 
-        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory -mx-6 px-6">
+        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
           {shorts.map((s) => (
             <ShortCard key={s.id} s={s} onPlay={() => setPlaying(s)} />
           ))}
