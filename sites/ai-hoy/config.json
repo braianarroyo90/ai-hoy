@@ -37,8 +37,9 @@
     "twitter_poster":  true,
     "video_shorts":    true,
     "youtube_curator": true,
-    "radar":           true,
-    "ai_hoy_live":     false
+    "radar":            true,
+    "entity_extractor": true,
+    "ai_hoy_live":      false
   },
 
   "twitter": {
