@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Secrets & credentials
+*.json
+!package.json
+!package-lock.json
+!tsconfig*.json
+!next.config*.json
+agents/token.json
+
+# Environment files
+.env
+.env.local
+.env*.local
+
+# Node
+node_modules/
+.next/
+
+# OS
+.DS_Store

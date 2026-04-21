@@ -302,6 +302,23 @@
   .tag.green { background: #ecfdf5; color: var(--green); }
   .tag.purple { background: #f5f3ff; color: var(--purple); }
   .tag.orange { background: #fffbeb; color: var(--orange); }
+  .tag.red { background: #fef2f2; color: #ef4444; }
+
+  /* WIP BANNER */
+  .wip-banner {
+    background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .wip-banner .wip-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .wip-banner .wip-text { font-size: 13px; color: #92400e; }
+  .wip-banner strong { color: #78350f; }
 
   /* HIGHLIGHT BOX */
   .highlight {
@@ -462,7 +479,7 @@
         <div class="label">Automatizado</div>
       </div>
       <div class="cover-stat">
-        <div class="number">9</div>
+        <div class="number">6+</div>
         <div class="label">Agentes activos</div>
       </div>
       <div class="cover-stat">
@@ -484,6 +501,8 @@
       <span class="badge">GitHub Actions</span>
       <span class="badge">Vercel</span>
       <span class="badge">PostHog</span>
+      <span class="badge">YouTube API</span>
+      <span class="badge">FFmpeg</span>
     </div>
     <div>Abril 2026</div>
   </div>
@@ -755,7 +774,159 @@
   </div>
 </div>
 
-<!-- PAGE 5: TECH STACK -->
+<!-- PAGE 5: VIDEO GENERATOR -->
+<div class="page">
+  <div class="section-label">Canal YouTube — En Desarrollo</div>
+  <h1>Generación automática de videos</h1>
+
+  <div class="wip-banner">
+    <div class="wip-icon">⚠️</div>
+    <div class="wip-text">
+      <strong>Estado: En desarrollo.</strong> El agente de generación de video está siendo construido y testeado localmente. No está en producción todavía. Esta documentación refleja el diseño actual, no el estado final.
+    </div>
+  </div>
+
+  <p class="lead">
+    El siguiente paso en la estrategia multimedia de AI Hoy: generar y subir automáticamente
+    YouTube Shorts a partir de los artículos publicados, sin intervención humana.
+  </p>
+
+  <h2>Pipeline de video</h2>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="icon">📰</div>
+      <div class="name">Artículo</div>
+      <div class="desc">status=published</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">✍️</div>
+      <div class="name">Guión</div>
+      <div class="desc">Claude Haiku</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">🎙️</div>
+      <div class="name">TTS</div>
+      <div class="desc">Edge TTS (voz AR)</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">🖼️</div>
+      <div class="name">Imágenes</div>
+      <div class="desc">Pollinations AI</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">🎬</div>
+      <div class="name">FFmpeg</div>
+      <div class="desc">Ken Burns + audio</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="icon">▶️</div>
+      <div class="name">YouTube</div>
+      <div class="desc">Data API v3</div>
+    </div>
+  </div>
+
+  <h2>Detalle técnico</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-icon blue">✍️</div>
+      <h3>Guión con Claude</h3>
+      <p>Claude Haiku genera un guión de 5 escenas (~60 segundos) en español a partir del artículo. Cada escena tiene texto de pantalla (máx. 6 palabras) y narración completa.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon green">🎙️</div>
+      <h3>Voz con Edge TTS</h3>
+      <p>Microsoft Edge TTS genera la narración en voz es-AR-TomasNeural (español argentino). Gratis, sin límites, sin API key adicional. Velocidad +10% para ritmo más dinámico.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon purple">🖼️</div>
+      <h3>Imágenes por escena</h3>
+      <p>Pollinations AI genera una imagen fotorrealista por escena basada en la narración. Sin API key. Fallback: fondo bokeh procedural con grid tecnológico, generado con Pillow.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon orange">🎬</div>
+      <h3>Montaje con FFmpeg</h3>
+      <p>Arquitectura de dos capas: fondo con efecto Ken Burns (zoom/paneo lento, diferente por escena) + overlay de texto estático y nítido. Fade in/out entre escenas.</p>
+    </div>
+  </div>
+
+  <h2>Especificaciones del video</h2>
+  <table class="stack-table">
+    <thead>
+      <tr><th>Parámetro</th><th>Valor</th><th>Motivo</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Formato</td>
+        <td><strong>1080 × 1920 px (9:16 vertical)</strong></td>
+        <td>YouTube Shorts — mayor alcance orgánico</td>
+      </tr>
+      <tr>
+        <td>Duración</td>
+        <td><strong>50–65 segundos</strong></td>
+        <td>Óptimo para Shorts, dentro del límite de 60s</td>
+      </tr>
+      <tr>
+        <td>Estructura</td>
+        <td><strong>5 escenas</strong></td>
+        <td>Gancho → contexto → datos → impacto → CTA</td>
+      </tr>
+      <tr>
+        <td>Voz</td>
+        <td><strong>es-AR-TomasNeural</strong></td>
+        <td>Español argentino natural, sin costo adicional</td>
+      </tr>
+      <tr>
+        <td>FPS</td>
+        <td><strong>25 fps</strong></td>
+        <td>Estándar PAL, suficiente para contenido estático animado</td>
+      </tr>
+      <tr>
+        <td>Videos por día</td>
+        <td><strong>2</strong></td>
+        <td>Dentro del límite gratuito de YouTube Data API (10k unidades/día)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Elementos visuales de cada frame</h2>
+  <div class="grid-2">
+    <ul class="feature-list">
+      <li>Puntos de progreso tipo Instagram Stories (arriba, centro)</li>
+      <li>Logo "AI HOY" flotante — arriba izquierda</li>
+      <li>Línea de acento vertical en color de categoría</li>
+      <li>Etiqueta de categoría sobre el texto principal</li>
+    </ul>
+    <ul class="feature-list">
+      <li>Texto principal en mayúsculas con sombra difusa</li>
+      <li>Fondo con bokeh desenfocado o imagen de Pollinations</li>
+      <li>Ken Burns: zoom/paneo distinto por escena</li>
+      <li>Handle @AIHoyES sutil al pie</li>
+    </ul>
+  </div>
+
+  <h2>Pendiente para producción</h2>
+  <ul class="feature-list">
+    <li>Autenticación OAuth con YouTube (primer login local → token.json)</li>
+    <li>Migración Supabase: columnas <code>video_url</code> y <code>video_generated_at</code></li>
+    <li>Secret <code>YOUTUBE_TOKEN_JSON</code> en GitHub Actions</li>
+    <li>Workflow <code>video-generator.yml</code> configurado y habilitado</li>
+    <li>Canal de YouTube AI Hoy creado y verificado</li>
+  </ul>
+
+  <div class="footer">
+    <div class="footer-logo"><span>AI</span> Hoy</div>
+    <div>Documentación del Sistema — 2026</div>
+  </div>
+</div>
+
+<!-- PAGE 6: TECH STACK -->
 <div class="page">
   <div class="section-label">Arquitectura Técnica</div>
   <h1>Stack tecnológico</h1>
@@ -822,6 +993,30 @@
         <td>Extracción OG images de sitios JS-rendered</td>
         <td><span class="tag green">Free</span></td>
       </tr>
+      <tr>
+        <td>Video — TTS</td>
+        <td><strong>Edge TTS</strong> (Microsoft)</td>
+        <td>Narración de guiones en español argentino</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Video — Imágenes</td>
+        <td><strong>Pollinations AI</strong></td>
+        <td>Generación de fondos fotorrealistas por escena</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Video — Montaje</td>
+        <td><strong>FFmpeg</strong> + <strong>Pillow</strong></td>
+        <td>Ken Burns, overlays de texto, concatenación de escenas</td>
+        <td><span class="tag green">Free</span></td>
+      </tr>
+      <tr>
+        <td>Video — Distribución</td>
+        <td><strong>YouTube Data API v3</strong></td>
+        <td>Upload automático de Shorts (2/día)</td>
+        <td><span class="tag green">Free (10k units/día)</span></td>
+      </tr>
     </tbody>
   </table>
 
@@ -882,13 +1077,22 @@
     identificadas para aumentar tráfico, engagement y monetización.
   </p>
 
-  <h2>Próximos pasos técnicos</h2>
+  <h2>En desarrollo ahora</h2>
   <div class="grid-2">
+    <div class="card">
+      <div class="card-icon orange">▶️</div>
+      <h3>YouTube Shorts automáticos <span class="tag orange" style="font-size:10px;vertical-align:middle;">WIP</span></h3>
+      <p>Agente que genera 2 videos/día: guión con Claude, voz con Edge TTS, imágenes con Pollinations AI, montaje con FFmpeg (Ken Burns), upload automático vía YouTube Data API.</p>
+    </div>
     <div class="card">
       <div class="card-icon blue">🗂️</div>
       <h3>Páginas de categoría SEO</h3>
       <p>URLs tipo /categoria/modelos-y-llms para capturar búsquedas específicas en Google. Alto impacto en tráfico orgánico.</p>
     </div>
+  </div>
+
+  <h2>Próximos pasos</h2>
+  <div class="grid-2">
     <div class="card">
       <div class="card-icon green">📧</div>
       <h3>Newsletter semanal</h3>
@@ -903,6 +1107,11 @@
       <div class="card-icon orange">💡</div>
       <h3>Resúmenes semanales IA</h3>
       <p>Artículos de síntesis generados por Claude que resumen los grandes temas de la semana en IA. Contenido original de alto valor.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon blue">🎙️</div>
+      <h3>Podcast automático</h3>
+      <p>Audio diario con los 5 artículos más importantes narrados por IA. Distribución en Spotify y Apple Podcasts vía RSS.</p>
     </div>
   </div>
 
