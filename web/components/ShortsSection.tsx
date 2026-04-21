@@ -119,18 +119,7 @@ export default function ShortsSection({ shorts }: { shorts: Short[] }) {
               <p className="text-xs text-zinc-500">Videos cortos de la comunidad</p>
             </div>
           </div>
-          <a
-            href="https://www.youtube.com/shorts"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
-          >
-            Ver más
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
+          </div>
 
         <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory -mx-6 px-6">
           {shorts.map((s) => (
