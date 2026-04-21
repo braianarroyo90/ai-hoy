@@ -43,13 +43,21 @@ Generá un JSON con esta estructura exacta:
     "texto": "3 párrafos de análisis profundo sobre el desarrollo más importante. No resumas, interpretá. ¿Por qué importa? ¿Qué cambia?"
   }},
   "ganadores": [
-    {{"nombre": "empresa o persona", "razon": "1 oración contundente explicando por qué ganó esta semana"}},
-    {{"nombre": "...", "razon": "..."}},
-    {{"nombre": "...", "razon": "..."}}
+    {{
+      "nombre": "empresa o persona",
+      "razon": "1 oración contundente explicando por qué ganó esta semana",
+      "articulos": [{{"titulo": "título del artículo que lo respalda", "slug": "slug-exacto-del-articulo"}}]
+    }},
+    {{"nombre": "...", "razon": "...", "articulos": [{{"titulo": "...", "slug": "..."}}]}},
+    {{"nombre": "...", "razon": "...", "articulos": [{{"titulo": "...", "slug": "..."}}]}}
   ],
   "perdedores": [
-    {{"nombre": "empresa o persona", "razon": "1 oración contundente explicando por qué perdió esta semana"}},
-    {{"nombre": "...", "razon": "..."}}
+    {{
+      "nombre": "empresa o persona",
+      "razon": "1 oración contundente explicando por qué perdió esta semana",
+      "articulos": [{{"titulo": "título del artículo que lo respalda", "slug": "slug-exacto-del-articulo"}}]
+    }},
+    {{"nombre": "...", "razon": "...", "articulos": [{{"titulo": "...", "slug": "..."}}]}}
   ],
   "tendencia": {{
     "titulo": "nombre de la tendencia emergente",
@@ -63,7 +71,7 @@ Generá un JSON con esta estructura exacta:
 def get_week_articles(db) -> list[dict]:
     week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
     result = db.table("articles") \
-        .select("es_title, es_summary, category, published_at, source_name") \
+        .select("es_title, es_summary, category, published_at, source_name, slug") \
         .eq("status", "published") \
         .gte("published_at", week_ago) \
         .order("published_at", desc=True) \
@@ -76,7 +84,12 @@ def format_articles(articles: list[dict]) -> str:
     lines = []
     for a in articles:
         date = a["published_at"][:10]
-        lines.append(f"[{date}] [{a['category']}] {a['es_title']}\n{a['es_summary']}\n")
+        slug = a.get("slug", "")
+        lines.append(
+            f"[{date}] [{a['category']}] {a['es_title']}\n"
+            f"slug: {slug}\n"
+            f"{a['es_summary']}\n"
+        )
     return "\n".join(lines)
 
 

@@ -5,11 +5,13 @@ export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "placeholder"
 );
 
+export type RadarArticleRef = { titulo: string; slug: string };
+
 export type RadarContent = {
   titulo: string;
   historia_semana: { titulo: string; texto: string };
-  ganadores: { nombre: string; razon: string }[];
-  perdedores: { nombre: string; razon: string }[];
+  ganadores: { nombre: string; razon: string; articulos?: RadarArticleRef[] }[];
+  perdedores: { nombre: string; razon: string; articulos?: RadarArticleRef[] }[];
   tendencia: { titulo: string; texto: string };
   lo_que_viene: string;
   pregunta_semana: string;

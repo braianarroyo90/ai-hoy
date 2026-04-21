@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { supabase, RadarReport } from "@/lib/supabase";
+import { supabase, RadarReport, RadarArticleRef } from "@/lib/supabase";
 import { siteConfig } from "@/lib/site-config";
 import type { Metadata } from "next";
 
@@ -105,13 +105,27 @@ export default async function RadarPage() {
         <section className="grid sm:grid-cols-2 gap-6 mb-10">
           <div>
             <div className="text-xs font-bold tracking-widest uppercase text-green-400 mb-4">Ganadores</div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {c.ganadores.map((g, i) => (
                 <div key={i} className="flex gap-3">
                   <span className="text-green-400 mt-0.5 shrink-0">↑</span>
                   <div>
                     <p className="font-semibold text-white text-sm">{g.nombre}</p>
-                    <p className="text-zinc-400 text-sm leading-snug">{g.razon}</p>
+                    <p className="text-zinc-400 text-sm leading-snug mb-2">{g.razon}</p>
+                    {g.articulos && g.articulos.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {g.articulos.map((a: RadarArticleRef) => (
+                          <Link
+                            key={a.slug}
+                            href={`/articulo/${a.slug}`}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-950/60 border border-green-800/50 text-green-400 text-xs hover:bg-green-900/60 transition-colors"
+                          >
+                            <span className="opacity-60">↗</span>
+                            <span className="truncate max-w-[180px]">{a.titulo}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -119,13 +133,27 @@ export default async function RadarPage() {
           </div>
           <div>
             <div className="text-xs font-bold tracking-widest uppercase text-red-400 mb-4">Perdedores</div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {c.perdedores.map((p, i) => (
                 <div key={i} className="flex gap-3">
                   <span className="text-red-400 mt-0.5 shrink-0">↓</span>
                   <div>
                     <p className="font-semibold text-white text-sm">{p.nombre}</p>
-                    <p className="text-zinc-400 text-sm leading-snug">{p.razon}</p>
+                    <p className="text-zinc-400 text-sm leading-snug mb-2">{p.razon}</p>
+                    {p.articulos && p.articulos.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {p.articulos.map((a: RadarArticleRef) => (
+                          <Link
+                            key={a.slug}
+                            href={`/articulo/${a.slug}`}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-950/60 border border-red-800/50 text-red-400 text-xs hover:bg-red-900/60 transition-colors"
+                          >
+                            <span className="opacity-60">↗</span>
+                            <span className="truncate max-w-[180px]">{a.titulo}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
