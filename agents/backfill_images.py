@@ -25,7 +25,8 @@ HEADERS = {
     "Accept-Language": "en-US,en;q=0.5",
 }
 
-def get_og_image(url: str) -> str | None:
+def scrape_og_image(url: str) -> str | None:
+    """Try static HTML scraping first."""
     try:
         resp = requests.get(url, timeout=10, headers=HEADERS, allow_redirects=True)
         if resp.status_code != 200:
@@ -34,7 +35,6 @@ def get_og_image(url: str) -> str | None:
         class OGParser(HTMLParser):
             og_image      = None
             twitter_image = None
-
             def handle_starttag(self, tag, attrs):
                 if tag != "meta":
                     return
@@ -48,9 +48,35 @@ def get_og_image(url: str) -> str | None:
 
         parser = OGParser()
         parser.feed(resp.text[:60000])
-        return parser.og_image or parser.twitter_image or None
+        return parser.og_image or parser.twitter_image
     except Exception:
         return None
+
+
+def microlink_og_image(url: str) -> str | None:
+    """Fallback: use Microlink API which handles JS-rendered sites."""
+    try:
+        r = requests.get(
+            "https://api.microlink.io",
+            params={"url": url, "meta": "true"},
+            timeout=15,
+        )
+        if r.status_code != 200:
+            return None
+        data = r.json().get("data", {})
+        image = data.get("image") or data.get("screenshot")
+        if isinstance(image, dict):
+            return image.get("url")
+        return None
+    except Exception:
+        return None
+
+
+def get_og_image(url: str) -> str | None:
+    image = scrape_og_image(url)
+    if image:
+        return image
+    return microlink_og_image(url)
 
 
 def backfill():
