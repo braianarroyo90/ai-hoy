@@ -28,6 +28,7 @@ jobs:
 
       - name: Post to Twitter
         env:
+          SITE_ID:                   ai-hoy
           SUPABASE_URL:              ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY:      ${{ secrets.SUPABASE_SERVICE_KEY }}
           TWITTER_API_KEY:           ${{ secrets.TWITTER_API_KEY }}

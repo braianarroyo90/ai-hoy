@@ -1,5 +1,5 @@
 """
-radar_generator.py — Genera El Radar semanal de AI Hoy.
+radar_generator.py — Genera El Radar semanal.
 Lee los artículos de la última semana desde Supabase,
 pide a Claude un reporte de inteligencia editorial y lo guarda.
 """
@@ -7,18 +7,28 @@ pide a Claude un reporte de inteligencia editorial y lo guarda.
 import os
 import sys
 import json
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from supabase import create_client
 import anthropic
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from core.config_loader import get_config, feature_enabled
 
 SUPABASE_URL  = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY  = os.environ.get("SUPABASE_SERVICE_KEY", "")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 
-SYSTEM_PROMPT = """Sos el editor jefe de AI Hoy, el medio de noticias de inteligencia artificial en español.
-Cada domingo generás "El Radar" — un reporte de inteligencia semanal con voz editorial propia.
-Tu tono es analítico, directo y perspicaz. No repetís noticias, las interpretás.
-Respondés ÚNICAMENTE con un JSON válido, sin texto adicional."""
+
+def build_system_prompt(config: dict) -> str:
+    voice = config["prompts"]["radar_voice"]
+    return (
+        f"{voice} "
+        'Cada domingo generás "El Radar" — un reporte de inteligencia semanal con voz editorial propia. '
+        "Tu tono es analítico, directo y perspicaz. No repetís noticias, las interpretás. "
+        "Respondés ÚNICAMENTE con un JSON válido, sin texto adicional."
+    )
+
 
 RADAR_PROMPT = """Analizá los siguientes artículos de la semana en IA y generá El Radar semanal.
 
@@ -70,14 +80,14 @@ def format_articles(articles: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def generate_radar(articles: list[dict]) -> dict:
+def generate_radar(articles: list[dict], system_prompt: str) -> dict:
     client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
     articles_text = format_articles(articles)
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=4000,
-        system=SYSTEM_PROMPT,
+        system=system_prompt,
         messages=[{
             "role": "user",
             "content": RADAR_PROMPT.format(articles_text=articles_text)
@@ -103,18 +113,25 @@ def already_published_this_week(db) -> bool:
 
 
 def main():
+    if not feature_enabled("radar"):
+        print("Feature 'radar' desactivada para este sitio.")
+        return
+
+    config = get_config()
+
     if not all([SUPABASE_URL, SUPABASE_KEY, ANTHROPIC_KEY]):
         print("ERROR: Faltan variables de entorno")
         sys.exit(1)
 
     db = create_client(SUPABASE_URL, SUPABASE_KEY)
+    system_prompt = build_system_prompt(config)
 
     force = "--force" in sys.argv
     if not force and already_published_this_week(db):
         print("Ya existe un Radar esta semana. Usá --force para regenerar.")
         return
 
-    print("Leyendo artículos de la semana...")
+    print(f"[{config['name']}] Leyendo artículos de la semana...")
     articles = get_week_articles(db)
     if len(articles) < 5:
         print(f"Solo {len(articles)} artículos esta semana — no es suficiente para el Radar.")
@@ -126,7 +143,7 @@ def main():
     week_end = now.date()
 
     print("Generando El Radar con Claude...")
-    content = generate_radar(articles)
+    content = generate_radar(articles, system_prompt)
     print(f"  Título: {content['titulo']}")
 
     row = {
