@@ -479,7 +479,7 @@
         <div class="label">Automatizado</div>
       </div>
       <div class="cover-stat">
-        <div class="number">6+</div>
+        <div class="number">8</div>
         <div class="label">Agentes activos</div>
       </div>
       <div class="cover-stat">
@@ -524,7 +524,7 @@
       Mientras otros medios requieren redactores, editores y community managers, AI Hoy opera
       con un pipeline de IA que procesa noticias de las mejores fuentes internacionales,
       las traduce al español con calidad editorial y las publica automáticamente en web,
-      Twitter/X y — próximamente — YouTube. El resultado: cobertura diaria en múltiples
+      Twitter/X y YouTube Shorts. El resultado: cobertura diaria en múltiples
       canales, a costo marginal cero.
     </p>
   </div>
@@ -534,17 +534,17 @@
     <div class="card">
       <div class="card-icon blue">🌐</div>
       <h3>Sitio web</h3>
-      <p>ai-hoy.vercel.app — artículos completos en español con SEO, categorías y artículos relacionados. Actualizado diariamente.</p>
+      <p>ai-hoy.vercel.app — artículos completos en español con SEO, categorías, artículos relacionados y sección de Shorts embebidos. Actualizado diariamente.</p>
     </div>
     <div class="card">
       <div class="card-icon" style="background:#e0f2fe;">🐦</div>
       <h3>Twitter / X</h3>
       <p>@AIHoyES — tweets automáticos de cada artículo publicado con título, link y hashtags por categoría.</p>
     </div>
-    <div class="card" style="border: 1px dashed #fcd34d; background: #fffbeb;">
-      <div class="card-icon orange">▶️</div>
-      <h3>YouTube Shorts <span class="tag orange" style="font-size:10px;vertical-align:middle;margin-left:4px;">WIP</span></h3>
-      <p>2 Shorts diarios generados con IA: guión, voz, imágenes y montaje totalmente automáticos. En integración.</p>
+    <div class="card">
+      <div class="card-icon" style="background:#fef2f2;">▶️</div>
+      <h3>YouTube Shorts</h3>
+      <p>2 Shorts diarios generados con IA: guión con Claude, voz con Edge TTS, imágenes con Pollinations AI y montaje con FFmpeg. En producción.</p>
     </div>
   </div>
 
@@ -630,10 +630,15 @@
           <div style="font-size:12px; font-weight:600; color:#0369a1;">Twitter Poster</div>
           <div style="font-size:11px; color:#0284c7; margin-top:2px;">Auto-tweet post pipeline</div>
         </div>
-        <div style="flex:1; min-width:160px; background:#fffbeb; border:1px dashed #fcd34d; border-radius:10px; padding:14px 16px;">
+        <div style="flex:1; min-width:160px; background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:14px 16px;">
           <div style="font-size:18px; margin-bottom:4px;">▶️</div>
-          <div style="font-size:12px; font-weight:600; color:#92400e;">Video Generator <span style="background:#fef3c7;color:#b45309;border:1px solid #fde68a;border-radius:4px;padding:1px 6px;font-size:9px;margin-left:4px;">WIP</span></div>
-          <div style="font-size:11px; color:#b45309; margin-top:2px;">2 Shorts/día → YouTube</div>
+          <div style="font-size:12px; font-weight:600; color:#b91c1c;">Video Generator</div>
+          <div style="font-size:11px; color:#dc2626; margin-top:2px;">2 Shorts/día → YouTube</div>
+        </div>
+        <div style="flex:1; min-width:160px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px 16px;">
+          <div style="font-size:18px; margin-bottom:4px;">🔍</div>
+          <div style="font-size:12px; font-weight:600; color:#15803d;">YouTube Curator</div>
+          <div style="font-size:11px; color:#16a34a; margin-top:2px;">Shorts de IA embebidos en web</div>
         </div>
       </div>
     </div>
@@ -738,6 +743,11 @@
         <td>Grid de 3 artículos de la misma categoría al final de cada artículo</td>
         <td><span class="tag">Server Component</span></td>
       </tr>
+      <tr>
+        <td><strong>ShortsSection</strong></td>
+        <td>Shelf horizontal de YouTube Shorts curados mid-feed. Click abre modal con dimmer y reproducción con sonido</td>
+        <td><span class="tag green">Client Component</span></td>
+      </tr>
     </tbody>
   </table>
 
@@ -808,16 +818,28 @@
     <p>Al finalizar el pipeline de contenido, postea automáticamente hasta 5 artículos nuevos en la cuenta <strong>@AIHoyES</strong> de X/Twitter. Genera tweets con título en español, link al artículo y hashtags según categoría. Marca cada artículo con <code>tweeted_at</code> para no repetir.</p>
   </div>
 
-  <div class="agent-card" style="border: 1px dashed #fcd34d; background: linear-gradient(135deg,#fffbeb,#fff);">
-    <div class="cron" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">WIP — post pipeline</div>
+  <div class="agent-card">
+    <div class="cron">post pipeline</div>
     <div class="agent-header">
-      <div class="agent-icon" style="background:#fef3c7;">▶️</div>
+      <div class="agent-icon" style="background:#fef2f2;">▶️</div>
       <div>
-        <h3>Video Generator <span class="tag orange" style="font-size:10px;vertical-align:middle;margin-left:6px;">En desarrollo</span></h3>
+        <h3>Video Generator <span class="tag green" style="font-size:10px;vertical-align:middle;margin-left:6px;">En producción</span></h3>
         <div class="trigger">2 YouTube Shorts por día — automático</div>
       </div>
     </div>
-    <p>Toma artículos publicados y genera Shorts de ~60 segundos completamente solos: <strong>Claude Haiku</strong> escribe el guión en 5 escenas, <strong>Edge TTS</strong> narra en español argentino, <strong>Pollinations AI</strong> genera una imagen por escena, <strong>FFmpeg</strong> monta el video con efecto Ken Burns y overlay de texto. El resultado se sube automáticamente a YouTube vía <strong>Data API v3</strong> y la URL queda guardada en Supabase.</p>
+    <p>Toma artículos publicados y genera Shorts de ~60 segundos: <strong>Claude Haiku</strong> escribe el guión en 5 escenas con prompts visuales específicos, <strong>Edge TTS</strong> narra en español argentino (es-AR-TomasNeural), <strong>Pollinations AI</strong> genera una imagen fotorrealista por escena, <strong>FFmpeg</strong> monta con efecto Ken Burns, overlays de texto y transiciones xfade. Se sube automáticamente a YouTube vía OAuth 2.0 y la URL queda guardada en Supabase.</p>
+  </div>
+
+  <div class="agent-card">
+    <div class="cron">0 8,20 * * *</div>
+    <div class="agent-header">
+      <div class="agent-icon" style="background:#f0fdf4;">🔍</div>
+      <div>
+        <h3>YouTube Curator <span class="tag green" style="font-size:10px;vertical-align:middle;margin-left:6px;">En producción</span></h3>
+        <div class="trigger">2 veces por día — 8:00 y 20:00 UTC</div>
+      </div>
+    </div>
+    <p>Busca Shorts recientes de IA en YouTube usando la <strong>Data API v3</strong> con queries en español (inteligencia artificial, AI news, OpenAI novedades, etc.). Guarda los videos en la tabla <code>youtube_shorts</code> de Supabase y limpia automáticamente los de más de 30 días. El frontend los muestra como shelf horizontal mid-feed en la home, con reproducción en modal con dimmer.</p>
   </div>
 
   <div class="footer">
@@ -828,19 +850,13 @@
 
 <!-- PAGE 5: VIDEO GENERATOR -->
 <div class="page">
-  <div class="section-label">Canal YouTube — En Desarrollo</div>
+  <div class="section-label">Canal YouTube — En Producción</div>
   <h1>Generación automática de videos</h1>
 
-  <div class="wip-banner">
-    <div class="wip-icon">⚠️</div>
-    <div class="wip-text">
-      <strong>Estado: En desarrollo.</strong> El agente de generación de video está siendo construido y testeado localmente. No está en producción todavía. Esta documentación refleja el diseño actual, no el estado final.
-    </div>
-  </div>
-
   <p class="lead">
-    El siguiente paso en la estrategia multimedia de AI Hoy: generar y subir automáticamente
-    YouTube Shorts a partir de los artículos publicados, sin intervención humana.
+    AI Hoy genera y sube automáticamente YouTube Shorts a partir de los artículos publicados.
+    El pipeline completo — guión, voz, imágenes, montaje y upload — corre sin intervención humana,
+    2 veces por día.
   </p>
 
   <h2>Pipeline de video</h2>
@@ -1056,8 +1072,14 @@
       </tr>
       <tr>
         <td>Video — Distribución</td>
-        <td><strong>YouTube Data API v3</strong></td>
-        <td>Upload automático de Shorts (2/día)</td>
+        <td><strong>YouTube Data API v3</strong> (OAuth)</td>
+        <td>Upload automático de Shorts (2/día) a canal propio</td>
+        <td><span class="tag green">Free (10k units/día)</span></td>
+      </tr>
+      <tr>
+        <td>Shorts — Curación</td>
+        <td><strong>YouTube Data API v3</strong> (API Key)</td>
+        <td>Búsqueda de Shorts de IA de terceros para embeber en la web</td>
         <td><span class="tag green">Free (10k units/día)</span></td>
       </tr>
     </tbody>
@@ -1120,17 +1142,31 @@
     identificadas para aumentar tráfico, engagement y monetización.
   </p>
 
+  <h2>Lanzado recientemente</h2>
+  <div class="grid-2">
+    <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+      <div class="card-icon" style="background:#dcfce7;">▶️</div>
+      <h3>YouTube Shorts automáticos <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
+      <p>2 videos/día generados con Claude, Edge TTS, Pollinations AI y FFmpeg. Subida automática vía OAuth 2.0. URL guardada en Supabase.</p>
+    </div>
+    <div class="card" style="border-color:#bbf7d0; background:#f0fdf4;">
+      <div class="card-icon" style="background:#dcfce7;">🔍</div>
+      <h3>YouTube Shorts Curator <span class="tag green" style="font-size:10px;vertical-align:middle;">Live</span></h3>
+      <p>Busca Shorts de IA de la comunidad 2 veces/día y los muestra embebidos en la home como shelf mid-feed. Reproducción con modal y dimmer.</p>
+    </div>
+  </div>
+
   <h2>En desarrollo ahora</h2>
   <div class="grid-2">
-    <div class="card">
-      <div class="card-icon orange">▶️</div>
-      <h3>YouTube Shorts automáticos <span class="tag orange" style="font-size:10px;vertical-align:middle;">WIP</span></h3>
-      <p>Agente que genera 2 videos/día: guión con Claude, voz con Edge TTS, imágenes con Pollinations AI, montaje con FFmpeg (Ken Burns), upload automático vía YouTube Data API.</p>
-    </div>
     <div class="card">
       <div class="card-icon blue">🗂️</div>
       <h3>Páginas de categoría SEO</h3>
       <p>URLs tipo /categoria/modelos-y-llms para capturar búsquedas específicas en Google. Alto impacto en tráfico orgánico.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon purple">📱</div>
+      <h3>Instagram Reels + TikTok</h3>
+      <p>El video generado por FFmpeg ya está en formato 9:16. Solo falta conectar las APIs de Instagram Graph y TikTok para distribuir automáticamente.</p>
     </div>
   </div>
 
