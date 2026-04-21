@@ -109,8 +109,9 @@ def main():
 
     db = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    if already_published_this_week(db):
-        print("Ya existe un Radar esta semana. Saliendo.")
+    force = "--force" in sys.argv
+    if not force and already_published_this_week(db):
+        print("Ya existe un Radar esta semana. Usá --force para regenerar.")
         return
 
     print("Leyendo artículos de la semana...")

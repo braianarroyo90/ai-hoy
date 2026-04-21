@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 8 * * 0"   # Domingos a las 8:00 UTC (5am Argentina)
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Forzar publicación aunque ya exista una esta semana"
+        type: boolean
+        default: false
 
 jobs:
   radar:
@@ -26,4 +31,4 @@ jobs:
           SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python agents/radar_generator.py
+        run: python agents/radar_generator.py ${{ github.event.inputs.force == 'true' && '--force' || '' }}
