@@ -56,7 +56,7 @@ def get_week_articles(db) -> list[dict]:
         .select("es_title, es_summary, category, published_at, source_name") \
         .eq("status", "published") \
         .gte("published_at", week_ago) \
-        .order("published_at", ascending=False) \
+        .order("published_at", desc=True) \
         .limit(40) \
         .execute()
     return result.data or []
