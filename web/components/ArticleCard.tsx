@@ -12,13 +12,20 @@ function timeAgo(dateStr: string): string {
   return `hace ${Math.floor(h / 24)}d`;
 }
 
+function readingTime(text: string): string {
+  const words = text.trim().split(/\s+/).length;
+  const mins  = Math.max(1, Math.round(words / 200));
+  return `${mins} min`;
+}
+
 export default function ArticleCard({ article, size = "md" }: { article: Article; size?: "lg" | "md" | "sm" }) {
-  const href = article.slug ? `/articulo/${article.slug}` : article.source_url;
+  const href       = article.slug ? `/articulo/${article.slug}` : article.source_url;
   const isInternal = !!article.slug;
+  const showSummary = size !== "sm";
 
   const imageHeight = size === "lg" ? "h-36 sm:h-56" : size === "sm" ? "h-24 sm:h-32" : "h-32 sm:h-44";
-  const titleSize = size === "lg" ? "text-sm sm:text-lg" : "text-xs sm:text-base";
-  const summaryLines = size === "sm" ? "line-clamp-2" : "line-clamp-3 sm:line-clamp-4";
+  const titleSize   = size === "lg" ? "text-sm sm:text-lg" : "text-xs sm:text-base";
+  const summaryClamp = size === "lg" ? "line-clamp-3" : "line-clamp-2";
 
   const content = (
     <>
@@ -42,19 +49,33 @@ export default function ArticleCard({ article, size = "md" }: { article: Article
       )}
 
       <div className="flex flex-col gap-1.5 sm:gap-2 p-3 sm:p-4 flex-1">
+        {/* Meta row */}
         <div className="flex items-center justify-between text-xs text-zinc-500">
           <span>{article.source_name}</span>
-          <span>{timeAgo(article.published_at)}</span>
+          <div className="flex items-center gap-2">
+            {article.es_summary && (
+              <span className="text-zinc-600">{readingTime(article.es_summary)}</span>
+            )}
+            <span>{timeAgo(article.published_at)}</span>
+          </div>
         </div>
 
-        <h2 className={`${titleSize} font-semibold leading-snug text-zinc-100 group-hover:text-white line-clamp-3`} style={{ fontFamily: "var(--font-space-grotesk)" }}>
+        {/* Title */}
+        <h2
+          className={`${titleSize} font-semibold leading-snug text-zinc-100 group-hover:text-white line-clamp-3`}
+          style={{ fontFamily: "var(--font-space-grotesk)" }}
+        >
           {article.es_title}
         </h2>
 
-        <p className={`text-xs text-zinc-400 leading-relaxed ${summaryLines} hidden sm:block`}>
-          {article.es_summary}
-        </p>
+        {/* Summary — always visible for md/lg */}
+        {showSummary && article.es_summary && (
+          <p className={`text-xs text-zinc-400 leading-relaxed ${summaryClamp}`}>
+            {article.es_summary}
+          </p>
+        )}
 
+        {/* Tags */}
         <div className="mt-auto pt-2 flex flex-wrap gap-1">
           {article.tags?.slice(0, 3).map((tag) => (
             <span
