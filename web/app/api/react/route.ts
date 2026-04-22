@@ -14,10 +14,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
 
-  const { data } = await supabase.rpc("increment_reaction", {
+  const { data, error } = await supabase.rpc("increment_reaction", {
     p_slug: slug,
     p_reaction: reaction,
   });
+
+  if (error) {
+    console.error("increment_reaction error:", error);
+    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+  }
 
   const counts = Object.fromEntries(
     (data ?? []).map((r: { reaction: string; count: number }) => [r.reaction, r.count])
