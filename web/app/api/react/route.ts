@@ -9,26 +9,49 @@ const supabase = createClient(
 const VALID_REACTIONS = ["fire", "shocked", "mindblown", "boring"];
 
 export async function POST(req: NextRequest) {
-  const { slug, reaction } = await req.json();
-  if (!slug || !VALID_REACTIONS.includes(reaction)) {
-    return NextResponse.json({ ok: false }, { status: 400 });
+  try {
+    const { slug, reaction } = await req.json();
+    if (!slug || !VALID_REACTIONS.includes(reaction)) {
+      return NextResponse.json({ ok: false }, { status: 400 });
+    }
+
+    // Read current count
+    const { data: existing } = await supabase
+      .from("reactions")
+      .select("count")
+      .eq("article_slug", slug)
+      .eq("reaction", reaction)
+      .maybeSingle();
+
+    const newCount = (existing?.count ?? 0) + 1;
+
+    const { error } = await supabase
+      .from("reactions")
+      .upsert(
+        { article_slug: slug, reaction, count: newCount },
+        { onConflict: "article_slug,reaction" }
+      );
+
+    if (error) {
+      console.error("upsert error:", error);
+      return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    }
+
+    // Return all counts for this article
+    const { data: allCounts } = await supabase
+      .from("reactions")
+      .select("reaction, count")
+      .eq("article_slug", slug);
+
+    const counts = Object.fromEntries(
+      (allCounts ?? []).map((r: { reaction: string; count: number }) => [r.reaction, r.count])
+    );
+
+    return NextResponse.json({ ok: true, counts });
+  } catch (e) {
+    console.error("react route error:", e);
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
-
-  const { data, error } = await supabase.rpc("increment_reaction", {
-    p_slug: slug,
-    p_reaction: reaction,
-  });
-
-  if (error) {
-    console.error("increment_reaction error:", error);
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
-  }
-
-  const counts = Object.fromEntries(
-    (data ?? []).map((r: { reaction: string; count: number }) => [r.reaction, r.count])
-  );
-
-  return NextResponse.json({ ok: true, counts });
 }
 
 export async function GET(req: NextRequest) {
