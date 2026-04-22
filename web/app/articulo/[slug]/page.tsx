@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { categoryToSlug } from "@/lib/categories";
 import { siteConfig } from "@/lib/site-config";
 import RelatedArticles from "@/components/RelatedArticles";
 import RelatedSidebar from "@/components/RelatedSidebar";
@@ -103,7 +104,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <article>
             {article.category && (
               <Link
-                href={`/?category=${encodeURIComponent(article.category)}`}
+                href={`/categoria/${categoryToSlug(article.category)}`}
                 className="inline-block px-3 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs mb-4 hover:bg-zinc-700 transition-colors"
               >
                 {article.category}

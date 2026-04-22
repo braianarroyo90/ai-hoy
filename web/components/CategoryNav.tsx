@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { categoryToSlug } from "@/lib/categories";
 
 export default function CategoryNav({
   active,
@@ -41,7 +42,7 @@ export default function CategoryNav({
             return (
               <Link
                 key={cat}
-                href={`/?category=${encodeURIComponent(cat)}`}
+                href={`/categoria/${categoryToSlug(cat)}`}
                 className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                   isActive
                     ? "bg-blue-600 text-white"

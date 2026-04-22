@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { supabase, Article } from "@/lib/supabase";
+import { categoryToSlug } from "@/lib/categories";
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -71,7 +72,7 @@ export default async function RelatedSidebar({ category, excludeSlug }: { catego
 
         <div className="pt-4 border-t border-zinc-800/60 mt-4">
           <Link
-            href={`/?category=${encodeURIComponent(category)}`}
+            href={`/categoria/${categoryToSlug(category)}`}
             className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
           >
             Ver todo en {category} →
