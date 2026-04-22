@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { siteConfig } from "@/lib/site-config";
 import type { Metadata } from "next";
 
-export const revalidate = 1800;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Pulso de la comunidad — ${siteConfig.name}`,
@@ -11,11 +11,9 @@ export const metadata: Metadata = {
 };
 
 type ReactionRow = { reaction: string; count: number };
-type ArticleReaction = {
-  article_slug: string;
-  reaction: string;
-  count: number;
-  articles: { es_title: string; slug: string; category: string } | null;
+type ReactionEntry = { article_slug: string; reaction: string; count: number };
+type ArticleReaction = ReactionEntry & {
+  article: { es_title: string; slug: string; category: string } | null;
 };
 
 const REACTIONS = [
@@ -31,10 +29,10 @@ async function getPulseData() {
     .from("reactions")
     .select("reaction, count");
 
-  // top 3 articles per reaction (last 30 days), joined with article title
+  // top reactions by count, no join
   const { data: top } = await supabase
     .from("reactions")
-    .select("article_slug, reaction, count, articles!inner(es_title, slug, category)")
+    .select("article_slug, reaction, count")
     .order("count", { ascending: false })
     .limit(40);
 
@@ -43,13 +41,27 @@ async function getPulseData() {
     globalCounts[row.reaction] = (globalCounts[row.reaction] ?? 0) + row.count;
   }
 
+  // collect unique slugs to fetch article titles in one query
+  const slugs = [...new Set((top ?? []).map((r: ReactionEntry) => r.article_slug))];
+  const { data: articleRows } = slugs.length
+    ? await supabase
+        .from("articles")
+        .select("slug, es_title, category")
+        .in("slug", slugs)
+    : { data: [] };
+
+  const articleMap = Object.fromEntries(
+    (articleRows ?? []).map((a: { slug: string; es_title: string; category: string }) => [a.slug, a])
+  );
+
   // group top articles per reaction (take top 3)
   const topByReaction: Record<string, ArticleReaction[]> = {};
-  for (const row of (top ?? []) as unknown as ArticleReaction[]) {
-    if (!row.articles) continue;
+  for (const row of (top ?? []) as ReactionEntry[]) {
+    const article = articleMap[row.article_slug] ?? null;
+    if (!article) continue;
     if (!topByReaction[row.reaction]) topByReaction[row.reaction] = [];
     if (topByReaction[row.reaction].length < 3) {
-      topByReaction[row.reaction].push(row);
+      topByReaction[row.reaction].push({ ...row, article });
     }
   }
 
@@ -177,17 +189,17 @@ export default async function PulsePage() {
                       {articles.map((a, i) => (
                         <Link
                           key={a.article_slug}
-                          href={`/articulo/${a.articles?.slug ?? a.article_slug}`}
+                          href={`/articulo/${a.article?.slug ?? a.article_slug}`}
                           className="flex items-start gap-3 group"
                         >
                           <span className="text-zinc-700 font-mono text-xs mt-0.5 w-4 shrink-0">{i + 1}.</span>
                           <div className="min-w-0">
                             <p className="text-zinc-300 text-sm leading-snug group-hover:text-white transition-colors line-clamp-2">
-                              {a.articles?.es_title}
+                              {a.article?.es_title}
                             </p>
                             <div className="flex items-center gap-2 mt-1">
-                              {a.articles?.category && (
-                                <span className="text-zinc-600 text-[10px]">{a.articles.category}</span>
+                              {a.article?.category && (
+                                <span className="text-zinc-600 text-[10px]">{a.article.category}</span>
                               )}
                               <span className={`text-[10px] font-bold ${text}`}>{a.count} {emoji}</span>
                             </div>
