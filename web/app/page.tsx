@@ -171,6 +171,12 @@ export default async function Home({
                 <span className="text-blue-400 text-xs font-semibold tracking-wide">El Radar</span>
               </Link>
               <Link
+                href="/pulso"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 hover:bg-zinc-700/50 transition-colors"
+              >
+                <span className="text-zinc-400 text-xs font-semibold tracking-wide">Pulso</span>
+              </Link>
+              <Link
                 href="/mapa"
                 className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 hover:bg-zinc-700/50 transition-colors"
               >
