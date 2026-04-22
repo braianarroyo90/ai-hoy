@@ -26,13 +26,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const article = await getArticle(slug);
   if (!article) return {};
+
+  const ogParams = new URLSearchParams({
+    title: article.es_title,
+    ...(article.category && { category: article.category }),
+    ...(article.source_name && { source: article.source_name }),
+  });
+  const generatedOg = `${siteConfig.url}/api/og?${ogParams.toString()}`;
+  const ogImage = article.og_image ?? generatedOg;
+
   return {
     title: article.es_title,
     description: article.es_summary,
     openGraph: {
       title: article.es_title,
       description: article.es_summary,
-      images: article.og_image ? [article.og_image] : [],
+      images: [ogImage],
       type: "article",
       publishedTime: article.published_at,
     },
@@ -40,7 +49,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       title: article.es_title,
       description: article.es_summary,
-      images: article.og_image ? [article.og_image] : [],
+      images: [ogImage],
     },
   };
 }
@@ -144,9 +153,13 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {article.tags?.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">
                 {article.tags.map((tag: string) => (
-                  <span key={tag} className="px-2 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs">
+                  <Link
+                    key={tag}
+                    href={`/tema/${encodeURIComponent(tag)}`}
+                    className="px-2 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs hover:bg-zinc-700 hover:text-zinc-200 transition-colors"
+                  >
                     #{tag}
-                  </span>
+                  </Link>
                 ))}
               </div>
             )}
