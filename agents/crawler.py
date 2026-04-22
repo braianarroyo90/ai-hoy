@@ -4,85 +4,86 @@ Skips articles already in DB (source_url is unique).
 """
 
 import os
+import sys
 import feedparser
 import requests
 from datetime import datetime, timezone
+from pathlib import Path
 from supabase import create_client
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from core.config_loader import get_config, feature_enabled
 
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 
-RSS_FEEDS = [
-    {"name": "TechCrunch AI",          "url": "https://techcrunch.com/tag/artificial-intelligence/feed/"},
-    {"name": "VentureBeat AI",         "url": "https://venturebeat.com/ai/feed/"},
-    {"name": "The Verge AI",           "url": "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml"},
-    {"name": "MIT Tech Review AI",     "url": "https://www.technologyreview.com/feed/"},
-    {"name": "Wired AI",               "url": "https://www.wired.com/feed/tag/ai/latest/rss"},
-    {"name": "Ars Technica",           "url": "https://feeds.arstechnica.com/arstechnica/technology-lab"},
-    {"name": "DeepMind Blog",          "url": "https://deepmind.google/blog/rss.xml"},
-    {"name": "OpenAI Blog",            "url": "https://openai.com/blog/rss.xml"},
-    {"name": "Hugging Face Blog",      "url": "https://huggingface.co/blog/feed.xml"},
-    {"name": "Google AI Blog",         "url": "https://blog.google/technology/ai/rss/"},
-    {"name": "The Batch",              "url": "https://www.deeplearning.ai/the-batch/feed.xml"},
-    {"name": "Towards Data Science",   "url": "https://towardsdatascience.com/feed"},
-    {"name": "AI News",                "url": "https://artificialintelligence-news.com/feed/"},
-    {"name": "Anthropic Blog",         "url": "https://www.anthropic.com/rss.xml"},
-    {"name": "Mistral Blog",           "url": "https://mistral.ai/news/rss"},
-    {"name": "Scale AI Blog",          "url": "https://scale.com/blog/feed"},
-    {"name": "Last Week in AI",           "url": "https://lastweekin.ai/feed"},
-    {"name": "The AI Beat (VentureBeat)", "url": "https://venturebeat.com/category/ai/feed/"},
-    # Tech general con mucho AI
-    {"name": "ZDNet AI",                  "url": "https://www.zdnet.com/topic/artificial-intelligence/rss.xml"},
-    {"name": "IEEE Spectrum AI",          "url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"},
-    {"name": "KDnuggets",                 "url": "https://www.kdnuggets.com/feed"},
-    {"name": "Synced AI",                 "url": "https://syncedreview.com/feed/"},
-    {"name": "AI Trends",                 "url": "https://www.aitrends.com/feed/"},
-    {"name": "InfoQ AI",                  "url": "https://www.infoq.com/ai-ml-data-eng/rss/"},
-    {"name": "The Register ML",           "url": "https://www.theregister.com/machine_learning/headlines.atom"},
-    {"name": "Analytics Vidhya",          "url": "https://www.analyticsvidhya.com/feed/"},
-    # Diseño + AI
-    {"name": "UX Collective",             "url": "https://uxdesign.cc/feed"},
-    {"name": "Smashing Magazine",         "url": "https://www.smashingmagazine.com/feed/"},
-    {"name": "Prototypr",                 "url": "https://prototypr.io/feed/"},
-    {"name": "Creative Bloq",             "url": "https://www.creativebloq.com/feed"},
-    {"name": "Muzli Design",              "url": "https://medium.com/feed/muzli-design-inspiration"},
-]
 
-AI_KEYWORDS = [
-    "artificial intelligence", "machine learning", "deep learning", "neural network",
-    "large language model", "llm", "gpt", "claude", "gemini", "mistral", "openai",
-    "anthropic", "deepmind", "generative ai", "diffusion model", "transformer",
-    "chatbot", "ai agent", "rag", "fine-tuning", "benchmark", "multimodal",
-    # diseño + AI
-    "ai design", "design ai", "generative design", "midjourney", "stable diffusion",
-    "dall-e", "ai art", "ai generated", "ai tool", "ai powered", "figma ai",
-    "ux ai", "ui ai", "design tool", "creative ai", "ai workflow",
-]
+def build_rss_feeds(config: dict) -> list[dict]:
+    return [{"name": url.split("/")[2], "url": url} for url in config["rss_sources"]]
 
 
-def is_ai_related(title: str, summary: str) -> bool:
+def build_keywords(config: dict) -> list[str]:
+    topic_words = config["topic"].lower().split()
+    categories  = [c.lower() for c in config["categories"]]
+    base = ["artificial intelligence", "machine learning", "deep learning",
+            "neural network", "llm", "gpt", "claude", "gemini", "openai",
+            "anthropic", "generative ai", "transformer", "chatbot", "ai agent"]
+    return list(set(base + topic_words + categories))
+
+
+def is_relevant(title: str, summary: str, keywords: list[str]) -> bool:
     text = (title + " " + summary).lower()
-    return any(kw in text for kw in AI_KEYWORDS)
+    return any(kw in text for kw in keywords)
+
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+}
 
 
 def get_og_image(url: str) -> str | None:
     try:
-        resp = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
         from html.parser import HTMLParser
+        resp = requests.get(url, timeout=10, headers=HEADERS, allow_redirects=True)
+        if resp.status_code != 200:
+            return None
 
         class OGParser(HTMLParser):
-            image = None
+            og_image      = None
+            twitter_image = None
             def handle_starttag(self, tag, attrs):
-                if tag == "meta":
-                    d = dict(attrs)
-                    if d.get("property") == "og:image":
-                        self.image = d.get("content")
+                if tag != "meta":
+                    return
+                d = dict(attrs)
+                prop    = d.get("property", "") or d.get("name", "")
+                content = d.get("content", "")
+                if prop == "og:image" and not self.og_image:
+                    self.og_image = content
+                if prop in ("twitter:image", "twitter:image:src") and not self.twitter_image:
+                    self.twitter_image = content
 
         parser = OGParser()
-        parser.feed(resp.text[:20000])
-        return parser.image
+        parser.feed(resp.text[:60000])
+        return parser.og_image or parser.twitter_image
     except Exception:
         return None
+
+
+def get_rss_image(entry) -> str | None:
+    """Extract image from RSS/Atom entry media fields."""
+    for field in ("media_content", "media_thumbnail"):
+        items = getattr(entry, field, None)
+        if items and isinstance(items, list) and items[0].get("url"):
+            return items[0]["url"]
+    for enc in getattr(entry, "enclosures", []):
+        if enc.get("type", "").startswith("image/") and enc.get("href"):
+            return enc["href"]
+    return None
 
 
 def parse_date(entry) -> str:
@@ -92,10 +93,19 @@ def parse_date(entry) -> str:
 
 
 def crawl():
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    inserted = 0
+    if not feature_enabled("crawler"):
+        print("Feature 'crawler' desactivada para este sitio.")
+        return
 
-    for feed_meta in RSS_FEEDS:
+    config   = get_config()
+    rss_feeds = build_rss_feeds(config)
+    keywords  = build_keywords(config)
+    supabase  = create_client(SUPABASE_URL, SUPABASE_KEY)
+    inserted  = 0
+
+    print(f"[{config['name']}] Crawling {len(rss_feeds)} fuentes...")
+
+    for feed_meta in rss_feeds:
         print(f"Fetching: {feed_meta['name']}")
         feed = feedparser.parse(feed_meta["url"])
 
@@ -106,10 +116,10 @@ def crawl():
 
             if not title or not url:
                 continue
-            if not is_ai_related(title, summary):
+            if not is_relevant(title, summary, keywords):
                 continue
 
-            og_image = get_og_image(url)
+            og_image = get_rss_image(entry) or get_og_image(url)
 
             row = {
                 "source_url":        url,

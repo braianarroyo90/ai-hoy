@@ -4,6 +4,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { Article } from "@/lib/supabase";
 
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  "Modelos y LLMs":        "from-blue-950 via-blue-900/60 to-zinc-900",
+  "Herramientas y Productos": "from-violet-950 via-violet-900/60 to-zinc-900",
+  "Investigación":         "from-teal-950 via-teal-900/60 to-zinc-900",
+  "Empresas y Negocios":   "from-amber-950 via-amber-900/60 to-zinc-900",
+  "Política y Ética":      "from-red-950 via-red-900/60 to-zinc-900",
+  "Robótica":              "from-cyan-950 via-cyan-900/60 to-zinc-900",
+  "Agentes de IA":         "from-green-950 via-green-900/60 to-zinc-900",
+  "Diseño e IA":           "from-pink-950 via-pink-900/60 to-zinc-900",
+};
+
+const CATEGORY_ICONS: Record<string, string> = {
+  "Modelos y LLMs":        "🧠",
+  "Herramientas y Productos": "🛠️",
+  "Investigación":         "🔬",
+  "Empresas y Negocios":   "📈",
+  "Política y Ética":      "⚖️",
+  "Robótica":              "🤖",
+  "Agentes de IA":         "🤖",
+  "Diseño e IA":           "🎨",
+};
+
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const h = Math.floor(diff / 3600000);
@@ -41,10 +63,14 @@ export default function ArticleCard({ article, size = "md" }: { article: Article
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-900/80 to-transparent" />
         </div>
       ) : (
-        <div className={`${imageHeight} w-full bg-zinc-800/50 flex items-center justify-center`}>
-          <svg className="w-8 h-8 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-          </svg>
+        <div className={`${imageHeight} w-full bg-gradient-to-br ${CATEGORY_GRADIENTS[article.category] ?? "from-zinc-900 via-zinc-800/60 to-zinc-900"} flex flex-col items-center justify-center gap-2 relative overflow-hidden`}>
+          <span className="text-3xl opacity-40 select-none">
+            {CATEGORY_ICONS[article.category] ?? "📰"}
+          </span>
+          <p className="text-zinc-500 text-[10px] font-medium tracking-widest uppercase px-4 text-center line-clamp-2">
+            {article.category ?? article.source_name}
+          </p>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.4)_100%)]" />
         </div>
       )}
 
