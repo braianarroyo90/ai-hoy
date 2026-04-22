@@ -45,7 +45,7 @@ async function getPulseData() {
 
   // group top articles per reaction (take top 3)
   const topByReaction: Record<string, ArticleReaction[]> = {};
-  for (const row of (top ?? []) as ArticleReaction[]) {
+  for (const row of (top ?? []) as unknown as ArticleReaction[]) {
     if (!row.articles) continue;
     if (!topByReaction[row.reaction]) topByReaction[row.reaction] = [];
     if (topByReaction[row.reaction].length < 3) {
