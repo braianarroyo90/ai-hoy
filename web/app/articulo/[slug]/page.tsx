@@ -6,6 +6,7 @@ import { siteConfig } from "@/lib/site-config";
 import RelatedArticles from "@/components/RelatedArticles";
 import RelatedSidebar from "@/components/RelatedSidebar";
 import ViewTracker from "@/components/ViewTracker";
+import ShareButtons from "@/components/ShareButtons";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -148,6 +149,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 ))}
               </div>
             )}
+
+            <ShareButtons
+              title={article.es_title}
+              url={`${siteConfig.url}/articulo/${article.slug}`}
+            />
 
             {/* Related al fondo — solo en mobile */}
             {article.category && article.slug && (
