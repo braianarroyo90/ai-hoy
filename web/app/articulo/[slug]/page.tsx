@@ -4,6 +4,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { siteConfig } from "@/lib/site-config";
 import RelatedArticles from "@/components/RelatedArticles";
+import RelatedSidebar from "@/components/RelatedSidebar";
 import ViewTracker from "@/components/ViewTracker";
 import type { Metadata } from "next";
 
@@ -95,77 +96,86 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </div>
         </header>
 
-        <article className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          {article.category && (
-            <Link
-              href={`/?category=${encodeURIComponent(article.category)}`}
-              className="inline-block px-3 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs mb-4 hover:bg-zinc-700 transition-colors"
-            >
-              {article.category}
-            </Link>
-          )}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 grid lg:grid-cols-[1fr_300px] gap-10">
 
-          <h1 className="text-2xl sm:text-3xl font-bold leading-snug text-white mb-4" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-            {article.es_title}
-          </h1>
+          {/* Contenido principal */}
+          <article>
+            {article.category && (
+              <Link
+                href={`/?category=${encodeURIComponent(article.category)}`}
+                className="inline-block px-3 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs mb-4 hover:bg-zinc-700 transition-colors"
+              >
+                {article.category}
+              </Link>
+            )}
 
-          <div className="flex items-center gap-3 text-sm text-zinc-500 mb-6">
-            <span>{article.source_name}</span>
-            <span>·</span>
-            <span>{timeAgo(article.published_at)}</span>
-          </div>
+            <h1 className="text-2xl sm:text-3xl font-bold leading-snug text-white mb-4" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+              {article.es_title}
+            </h1>
 
-          {article.og_image && (
-            <div className="relative w-full h-64 sm:h-80 rounded-xl overflow-hidden mb-8 bg-zinc-800">
-              <Image
-                src={article.og_image}
-                alt={article.es_title}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+            <div className="flex items-center gap-3 text-sm text-zinc-500 mb-6">
+              <span>{article.source_name}</span>
+              <span>·</span>
+              <span>{timeAgo(article.published_at)}</span>
             </div>
-          )}
 
-          <div className="prose prose-invert prose-zinc max-w-none">
-            {paragraphs.map((p: string, i: number) => (
-              <p key={i} className="text-zinc-300 leading-7 mb-5 text-base sm:text-lg">
-                {p}
-              </p>
-            ))}
-          </div>
+            {article.og_image && (
+              <div className="relative w-full h-64 sm:h-80 rounded-xl overflow-hidden mb-8 bg-zinc-800">
+                <Image
+                  src={article.og_image}
+                  alt={article.es_title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            )}
 
-          {article.tags?.length > 0 && (
-            <div className="mt-8 flex flex-wrap gap-2">
-              {article.tags.map((tag: string) => (
-                <span key={tag} className="px-2 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs">
-                  #{tag}
-                </span>
+            <div className="prose prose-invert prose-zinc max-w-none">
+              {paragraphs.map((p: string, i: number) => (
+                <p key={i} className="text-zinc-300 leading-7 mb-5 text-base sm:text-lg">
+                  {p}
+                </p>
               ))}
             </div>
-          )}
 
+            {article.tags?.length > 0 && (
+              <div className="mt-8 flex flex-wrap gap-2">
+                {article.tags.map((tag: string) => (
+                  <span key={tag} className="px-2 py-1 rounded-full bg-zinc-800 text-zinc-400 text-xs">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Related al fondo — solo en mobile */}
+            {article.category && article.slug && (
+              <div className="lg:hidden">
+                <RelatedArticles category={article.category} excludeSlug={article.slug} />
+              </div>
+            )}
+
+            <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center justify-between flex-wrap gap-4">
+              <Link href="/" className="text-sm text-zinc-400 hover:text-white transition-colors">
+                ← Volver al inicio
+              </Link>
+              <a
+                href={article.source_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-zinc-900 font-medium text-sm hover:bg-zinc-100 transition-colors"
+              >
+                Leer artículo original en {article.source_name} →
+              </a>
+            </div>
+          </article>
+
+          {/* Sidebar sticky — solo en desktop */}
           {article.category && article.slug && (
-            <RelatedArticles category={article.category} excludeSlug={article.slug} />
+            <RelatedSidebar category={article.category} excludeSlug={article.slug} />
           )}
-
-          <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center justify-between flex-wrap gap-4">
-            <Link
-              href="/"
-              className="text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer"
-            >
-              ← Volver al inicio
-            </Link>
-            <a
-              href={article.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-zinc-900 font-medium text-sm hover:bg-zinc-100 transition-colors cursor-pointer"
-            >
-              Leer artículo original en {article.source_name} →
-            </a>
-          </div>
-        </article>
+        </div>
       </main>
     </>
   );
