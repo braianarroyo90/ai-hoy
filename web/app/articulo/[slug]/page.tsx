@@ -8,6 +8,7 @@ import RelatedArticles from "@/components/RelatedArticles";
 import RelatedSidebar from "@/components/RelatedSidebar";
 import ViewTracker from "@/components/ViewTracker";
 import ShareButtons from "@/components/ShareButtons";
+import ReactionBar from "@/components/ReactionBar";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -163,6 +164,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 ))}
               </div>
             )}
+
+            <ReactionBar slug={article.slug} />
 
             <ShareButtons
               title={article.es_title}
