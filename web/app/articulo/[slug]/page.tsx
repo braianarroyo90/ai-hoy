@@ -4,6 +4,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { siteConfig } from "@/lib/site-config";
 import RelatedArticles from "@/components/RelatedArticles";
+import ViewTracker from "@/components/ViewTracker";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
@@ -76,6 +77,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <>
+      <ViewTracker slug={article.slug} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

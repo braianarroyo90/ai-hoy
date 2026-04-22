@@ -7,6 +7,8 @@ import HeroEditorial from "@/components/HeroEditorial";
 import NewsTicker from "@/components/NewsTicker";
 import ShortsSection from "@/components/ShortsSection";
 import RadarCard from "@/components/RadarCard";
+import MostRead from "@/components/MostRead";
+import BreakingNews from "@/components/BreakingNews";
 
 export const revalidate = 3600;
 
@@ -62,7 +64,10 @@ export default async function Home({
   const category = params.category;
   const page     = Math.max(1, parseInt(params.page ?? "1", 10));
 
-  const [{ articles, total }, counts, shortsData, radarData] = await Promise.all([
+  const sixHoursAgo = new Date(Date.now() - 6 * 3600 * 1000).toISOString();
+  const weekAgo     = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+
+  const [{ articles, total }, counts, shortsData, radarData, breakingData, mostReadData] = await Promise.all([
     getArticles(category, page),
     getCategoryCounts(),
     supabase
@@ -76,8 +81,24 @@ export default async function Home({
       .order("published_at", { ascending: false })
       .limit(1)
       .single(),
+    supabase
+      .from("articles")
+      .select("id, source_url, es_title, es_summary, slug, category, published_at, tags, source_name, og_image")
+      .eq("status", "published")
+      .gte("published_at", sixHoursAgo)
+      .order("published_at", { ascending: false })
+      .limit(3),
+    supabase
+      .from("articles")
+      .select("id, source_url, es_title, es_summary, slug, category, published_at, tags, source_name, og_image, view_count")
+      .eq("status", "published")
+      .gte("published_at", weekAgo)
+      .order("view_count", { ascending: false })
+      .limit(5),
   ]);
-  const radar = radarData.data as RadarReport | null;
+  const radar      = radarData.data as RadarReport | null;
+  const breaking   = (breakingData.data ?? []) as Article[];
+  const mostRead   = (mostReadData.data ?? []) as Article[];
   const MOCK_SHORTS = [
     { id: "dQw4w9WgXcQ", title: "Video de prueba — los reales cargan desde Supabase", channel: "AI Hoy", thumbnail: "", published_at: new Date().toISOString() },
   ];
@@ -134,6 +155,15 @@ export default async function Home({
             </div>
             <div className="flex items-center gap-2">
               <Link
+                href="/buscar"
+                className="p-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 hover:bg-zinc-700/50 transition-colors"
+                aria-label="Buscar"
+              >
+                <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </Link>
+              <Link
                 href="/radar"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600/15 border border-blue-500/30 hover:bg-blue-600/25 transition-colors"
               >
@@ -142,7 +172,7 @@ export default async function Home({
               </Link>
               <Link
                 href="/mapa"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 hover:bg-zinc-700/50 transition-colors"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700/50 hover:bg-zinc-700/50 transition-colors"
               >
                 <span className="text-zinc-400 text-xs font-semibold tracking-wide">Mapa</span>
               </Link>
@@ -154,6 +184,10 @@ export default async function Home({
         <CategoryNav active={category} categories={siteConfig.categories} counts={counts} />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {!category && page === 1 && breaking.length > 0 && (
+            <BreakingNews articles={breaking} />
+          )}
+
           {!category && page === 1 && radar && (
             <RadarCard radar={radar} />
           )}
@@ -169,6 +203,11 @@ export default async function Home({
               )}
 
               <div className="mt-2 grid gap-3 sm:gap-5 grid-cols-2 lg:grid-cols-3">
+                {!category && page === 1 && mostRead.length > 0 && (
+                  <div className="col-span-full">
+                    <MostRead articles={mostRead} />
+                  </div>
+                )}
                 {(showHero ? gridArticles : articles).map((a, i) => (
                   <>
                     {!category && page === 1 && i === 6 && (
